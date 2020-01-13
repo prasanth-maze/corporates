@@ -1,0 +1,21 @@
+CREATE NONCLUSTERED INDEX CostElementGroupOnly
+ON Budget_CostCenter_CostElement_19_20_SAP(CostElementGroup);
+
+CREATE NONCLUSTERED INDEX CostElementNameOnly
+ON Budget_CostCenter_CostElement_19_20_SAP(CostElementName);
+
+CREATE NONCLUSTERED INDEX BusinessDivisionOnly
+ON Budget_CostCenter_CostElement_19_20_SAP(BusinessDivision);
+
+CREATE NONCLUSTERED INDEX DepartmentNameOnly
+ON Budget_CostCenter_CostElement_19_20_SAP(DepartmentName);
+
+CREATE NONCLUSTERED INDEX DivisionOnly
+ON Budget_CostCenter_CostElement_19_20_SAP(Division);
+
+CREATE NONCLUSTERED INDEX RegionOnly
+ON Budget_CostCenter_CostElement_19_20_SAP(Region);
+
+CREATE NONCLUSTERED INDEX TerritoryOnly
+ON Budget_CostCenter_CostElement_19_20_SAP(Territory);
+

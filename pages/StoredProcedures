@@ -1,0 +1,105 @@
+USE [rasi_seeds]
+GO
+/****** Object:  StoredProcedure [dbo].[eventKYI]    Script Date: 7/13/2019 10:42:25 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER PROCEDURE [dbo].[eventKYI] @pdiv varchar(55),@fromdate nvarchar(55),@todate nvarchar(55),@zcode nvarchar(55),@rbmcode nvarchar(55),
+@tmcode nvarchar(55),@pocode nvarchar(55),@product nvarchar(255),@hybrid nvarchar(255),@activity nvarchar(255),@subactivity varchar(255)
+AS
+DECLARE @SQ nvarchar(4000)
+DECLARE @STATUS nvarchar(55)
+BEGIN 
+	/*PLANNED EVENT COUNT START*/
+	SET @SQ = 'SELECT COUNT(evt.EVENTCODE) AS evtplanned FROM RASI_APEVENTTABLE as evt'
+	SET @SQ = @SQ+' WHERE  CAST(evt.CREATIONDATE AS date) BETWEEN '''+@fromdate+''' AND '''+@todate+''''
+	IF (@zcode IS NOT NULL AND (@zcode<>'All') AND (@zcode<>''))
+	SET @SQ = @SQ+' AND evt.ZONEID='''+@zcode+''''
+	IF (@rbmcode IS NOT NULL AND (@rbmcode<>'All') AND (@rbmcode<>''))
+	SET @SQ = @SQ+' AND evt.REGIONID='''+@rbmcode+''''
+	IF (@tmcode IS NOT NULL AND (@tmcode<>'All') AND (@tmcode<>''))
+	SET @SQ = @SQ+' AND evt.TMID='''+@tmcode+''''
+	IF (@pocode IS NOT NULL AND (@pocode<>'All') AND @pocode<>'')
+	SET @SQ = @SQ+' AND evt.POHQCODE='''+@pocode+''''
+	IF (@product IS NOT NULL AND (@product<>'All') AND @product<>'')
+	SET @SQ = @SQ+' AND evt.CROPNAME='''+@product+''''
+	IF (@hybrid IS NOT NULL AND (@hybrid<>'All') AND @hybrid<>'')
+	SET @SQ = @SQ+' AND evt.HYBRIDNAME='''+@hybrid+''''
+	IF (@activity IS NOT NULL AND (@activity<>'All') AND @activity<>'')
+	SET @SQ = @SQ+' AND evt.ACTIVITYTYPE='''+@activity+''''
+	IF (@subactivity IS NOT NULL AND (@subactivity<>'All') AND @subactivity<>'')
+	SET @SQ = @SQ+' AND evt.ACTIVITYNAME='''+@subactivity+''''
+	EXECUTE sp_executesql @SQ
+	/*EVENT PLANNED COUNT END*/
+
+	/*EVENT EXECUTED COUNT START*/
+	SET @SQ = 'SELECT COUNT(evt.EVENTCODE) AS evtexec FROM RASI_APEVENTTABLE as evt'
+	SET @SQ = @SQ+' JOIN RASI_APEVENTRECORDERLOGTABLE AS evtl ON evt.EVENTCODE=evtl.EVENTCODE '
+	SET @SQ = @SQ+' WHERE  CAST(evt.CREATIONDATE AS date) BETWEEN '''+@fromdate+''' AND '''+@todate+''''
+	IF (@zcode IS NOT NULL AND (@zcode<>'All') AND (@zcode<>''))
+	SET @SQ = @SQ+' AND evt.ZONEID='''+@zcode+''''
+	IF (@rbmcode IS NOT NULL AND (@rbmcode<>'All') AND (@rbmcode<>''))
+	SET @SQ = @SQ+' AND evt.REGIONID='''+@rbmcode+''''
+	IF (@tmcode IS NOT NULL AND (@tmcode<>'All') AND (@tmcode<>''))
+	SET @SQ = @SQ+' AND evt.TMID='''+@tmcode+''''
+	IF (@pocode IS NOT NULL AND (@pocode<>'All') AND @pocode<>'')
+	SET @SQ = @SQ+' AND evt.POHQCODE='''+@pocode+''''
+	IF (@product IS NOT NULL AND (@product<>'All') AND @product<>'')
+	SET @SQ = @SQ+' AND evt.CROPNAME='''+@product+''''
+	IF (@hybrid IS NOT NULL AND (@hybrid<>'All') AND @hybrid<>'')
+	SET @SQ = @SQ+' AND evt.HYBRIDNAME='''+@hybrid+''''
+	IF (@activity IS NOT NULL AND (@activity<>'All') AND @activity<>'')
+	SET @SQ = @SQ+' AND evt.ACTIVITYTYPE='''+@activity+''''
+	IF (@subactivity IS NOT NULL AND (@subactivity<>'All') AND @subactivity<>'')
+	SET @SQ = @SQ+' AND evt.ACTIVITYNAME='''+@subactivity+''''
+	EXECUTE sp_executesql @SQ
+	/*RETURN @SQ*/
+	/*EVENT EXECUTED COUNT END*/
+	
+	/*APPROVED EVENT COUNT START*/
+	SET @STATUS = 'APPROVED'
+	SET @SQ = 'SELECT COUNT(evt.EVENTCODE) AS evtapproved FROM RASI_APEVENTTABLE as evt'
+	SET @SQ = @SQ+' WHERE evt.APPROVALPENDINGSTATUS='''+@STATUS+''' AND  CAST(evt.CREATIONDATE AS date) BETWEEN '''+@fromdate+''' AND '''+@todate+''''
+	IF (@zcode IS NOT NULL AND (@zcode<>'All') AND (@zcode<>''))
+	SET @SQ = @SQ+' AND evt.ZONEID='''+@zcode+''''
+	IF (@rbmcode IS NOT NULL AND (@rbmcode<>'All') AND (@rbmcode<>''))
+	SET @SQ = @SQ+' AND evt.REGIONID='''+@rbmcode+''''
+	IF (@tmcode IS NOT NULL AND (@tmcode<>'All') AND (@tmcode<>''))
+	SET @SQ = @SQ+' AND evt.TMID='''+@tmcode+''''
+	IF (@pocode IS NOT NULL AND (@pocode<>'All') AND @pocode<>'')
+	SET @SQ = @SQ+' AND evt.POHQCODE='''+@pocode+''''
+	IF (@product IS NOT NULL AND (@product<>'All') AND @product<>'')
+	SET @SQ = @SQ+' AND evt.CROPNAME='''+@product+''''
+	IF (@hybrid IS NOT NULL AND (@hybrid<>'All') AND @hybrid<>'')
+	SET @SQ = @SQ+' AND evt.HYBRIDNAME='''+@hybrid+''''
+	IF (@activity IS NOT NULL AND (@activity<>'All') AND @activity<>'')
+	SET @SQ = @SQ+' AND evt.ACTIVITYTYPE='''+@activity+''''
+	IF (@subactivity IS NOT NULL AND (@subactivity<>'All') AND @subactivity<>'')
+	SET @SQ = @SQ+' AND evt.ACTIVITYNAME='''+@subactivity+''''
+	EXECUTE sp_executesql @SQ
+	/*APPROVED EVENT COUNT END*/
+
+	/*APPROVAL PENDING  EVENT COUNT START*/
+	SET @STATUS = 'PENDING'
+	SET @SQ = 'SELECT COUNT(evt.EVENTCODE) AS evtpending FROM RASI_APEVENTTABLE as evt'
+	SET @SQ = @SQ+' WHERE evt.APPROVALPENDINGSTATUS='''+@STATUS+''' AND  CAST(evt.CREATIONDATE AS date) BETWEEN '''+@fromdate+''' AND '''+@todate+''''
+	IF (@zcode IS NOT NULL AND (@zcode<>'All') AND (@zcode<>''))
+	SET @SQ = @SQ+' AND evt.ZONEID='''+@zcode+''''
+	IF (@rbmcode IS NOT NULL AND (@rbmcode<>'All') AND (@rbmcode<>''))
+	SET @SQ = @SQ+' AND evt.REGIONID='''+@rbmcode+''''
+	IF (@tmcode IS NOT NULL AND (@tmcode<>'All') AND (@tmcode<>''))
+	SET @SQ = @SQ+' AND evt.TMID='''+@tmcode+''''
+	IF (@pocode IS NOT NULL AND (@pocode<>'All') AND @pocode<>'')
+	SET @SQ = @SQ+' AND evt.POHQCODE='''+@pocode+''''
+	IF (@product IS NOT NULL AND (@product<>'All') AND @product<>'')
+	SET @SQ = @SQ+' AND evt.CROPNAME='''+@product+''''
+	IF (@hybrid IS NOT NULL AND (@hybrid<>'All') AND @hybrid<>'')
+	SET @SQ = @SQ+' AND evt.HYBRIDNAME='''+@hybrid+''''
+	IF (@activity IS NOT NULL AND (@activity<>'All') AND @activity<>'')
+	SET @SQ = @SQ+' AND evt.ACTIVITYTYPE='''+@activity+''''
+	IF (@subactivity IS NOT NULL AND (@subactivity<>'All') AND @subactivity<>'')
+	SET @SQ = @SQ+' AND evt.ACTIVITYNAME='''+@subactivity+''''
+	EXECUTE sp_executesql @SQ
+	/* APPROVAL PENDING  EVENT COUNT END*/
+END
