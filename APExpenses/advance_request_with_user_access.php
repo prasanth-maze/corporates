@@ -4,7 +4,7 @@
   $_SESSION['status'];  //Status = 0
   $_SESSION['Dcode'];    // Dcode -- Designation Code
   $_SESSION['Name']; 
-  $_SESSION['finRights'];  // finRights  = 0 or 1
+  $_SESSION['finRights'];  // finRights  = 0 or 1 
 
 if($_SESSION['Dcode'] == 'ZM'){
 /*   $sql ="SELECT ZONEID FROM  RASI_ZONETABLE WHERE DBMID='".$_SESSION['EmpID']."'";
