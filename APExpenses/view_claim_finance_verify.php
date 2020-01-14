@@ -1,6 +1,7 @@
 <?php 
 include 'header.php';
 include 'user_filter_access.php';
+include 'trzmappingemp.php';
 ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <!-- select 2 -->
@@ -424,15 +425,67 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                     <tbody>
                     <?php 
                     $i=0;
+                    if(isset($_REQUEST['filter']))
+                    {
+                      $from_date = $to_date = $division_id = $region_id = $teritory_id = $status = '';
+                      $from_date    = date("Y-m-d", strtotime($_REQUEST['fromdate'])); 
+                      $to_date      = date("Y-m-d", strtotime($_REQUEST['todate'])); 
+                      $division_id  = $_REQUEST['division_id'];
+                      $region_id    = $_REQUEST['region_id'];
+                      $teritory_id  = $_REQUEST['teritory_id']; 
+                      $status       = $_REQUEST['status'];
+
+                      $adv_det ="SELECT ANP_Settlements.SId, ANP_Settlements.SCode, CONVERT (NVARCHAR(50),ANP_Settlements.SettlementDate,105) as SettlementDate, APACTIVITYTYPEMASTER.ACTIVITYTYPE, APSUBACTIVITYMASTER.SUBACTIVITY, 
+                      (coalesce(SUM(ANP_Settlements_Claim.BaseAmount),0) +  coalesce(SUM(ANP_Settlements_Claim.GstAmount),0)) as 'SettledAmt',
+                      coalesce(SUM(ANP_Settlements_Claim.ApprovedAmount),0)  as 'ApprovedAmt', coalesce(SUM(ANP_Settlements_Claim.VerifiedAmount),0)  as 'VerifyAmt'  FROM ANP_Settlements LEFT JOIN APACTIVITYTYPEMASTER ON ANP_Settlements.ActivityId=APACTIVITYTYPEMASTER.ID 
+                      LEFT JOIN APSUBACTIVITYMASTER ON ANP_Settlements.SubActivityId=APSUBACTIVITYMASTER.ID 
+                      LEFT JOIN ANP_Settlements_Claim ON ANP_Settlements.SId=ANP_Settlements_Claim.SId 
+                      WHERE ANP_Settlements.CurrentStatus=1 ";
+                      if($_SESSION['Dcode'] == 'ZM'){
+                        $adv_det.=" AND ANP_Settlements.DivisionId IN ($dmall)";
+                      }elseif($_SESSION['Dcode'] == 'DBM'){
+                        $adv_det.=" AND ANP_Settlements.RegionId IN ($rgall)";
+                      }elseif($_SESSION['Dcode'] == 'TM'){
+                        $adv_det.=" AND ANP_Settlements.TeritoryId IN ($tmall)";
+                      }
+                      if(!empty($_REQUEST['fromdate'])) {
+                        $adv_det.=" AND ANP_Settlements.SettlementDate BETWEEN '$from_date' AND '$to_date'";
+                      }
+                      if(!empty($division_id)) {
+                        $adv_det.=" AND ANP_Settlements.DivisionId='$division_id'";
+                      }
+                      if(!empty($region_id)) {
+                        $adv_det.=" AND ANP_Settlements.RegionId='$region_id'";
+                      }
+                      if(!empty($teritory_id)) {
+                        $adv_det.=" AND ANP_Settlements.TeritoryId='$teritory_id'";
+                      }
+                      if(!empty($status)) {
+                        // $viw_adv.="Cus_Branch	='$branch'";
+                      }
+                      $adv_det.=" GROUP BY ANP_Settlements.SId,ANP_Settlements.SCode 
+                      ,ANP_Settlements.SettlementDate, APACTIVITYTYPEMASTER.ACTIVITYTYPE, APSUBACTIVITYMASTER.SUBACTIVITY";
+
+                    }else{
+                      $adv_det ="SELECT ANP_Settlements.SId, ANP_Settlements.SCode, CONVERT (NVARCHAR(50),ANP_Settlements.SettlementDate,105) as SettlementDate, APACTIVITYTYPEMASTER.ACTIVITYTYPE, APSUBACTIVITYMASTER.SUBACTIVITY, 
+                      (coalesce(SUM(ANP_Settlements_Claim.BaseAmount),0) +  coalesce(SUM(ANP_Settlements_Claim.GstAmount),0)) as 'SettledAmt',
+                      coalesce(SUM(ANP_Settlements_Claim.ApprovedAmount),0)  as 'ApprovedAmt', coalesce(SUM(ANP_Settlements_Claim.VerifiedAmount),0)  as 'VerifyAmt'  FROM ANP_Settlements LEFT JOIN APACTIVITYTYPEMASTER ON ANP_Settlements.ActivityId=APACTIVITYTYPEMASTER.ID 
+                      LEFT JOIN APSUBACTIVITYMASTER ON ANP_Settlements.SubActivityId=APSUBACTIVITYMASTER.ID 
+                      LEFT JOIN ANP_Settlements_Claim ON ANP_Settlements.SId=ANP_Settlements_Claim.SId 
+                      WHERE ANP_Settlements.CurrentStatus=1 ";
+                      if($_SESSION['Dcode'] == 'ZM'){
+                        $adv_det.=" AND ANP_Settlements.DivisionId IN ($dmall)";
+                      }elseif($_SESSION['Dcode'] == 'DBM'){
+                        $adv_det.=" AND ANP_Settlements.RegionId IN ($rgall)";
+                      }elseif($_SESSION['Dcode'] == 'TM'){
+                        $adv_det.=" AND ANP_Settlements.TeritoryId IN ($tmall)";
+                      }
+                      $adv_det.=" GROUP BY ANP_Settlements.SId,ANP_Settlements.SCode 
+                      ,ANP_Settlements.SettlementDate, APACTIVITYTYPEMASTER.ACTIVITYTYPE, APSUBACTIVITYMASTER.SUBACTIVITY";
+                    }
                     
-                    $viw_advs =sqlsrv_query($conn,"SELECT ANP_Settlements.SId, ANP_Settlements.SCode, CONVERT (NVARCHAR(50),ANP_Settlements.SettlementDate,105) as SettlementDate, APACTIVITYTYPEMASTER.ACTIVITYTYPE, APSUBACTIVITYMASTER.SUBACTIVITY, 
-                    (coalesce(SUM(ANP_Settlements_Claim.BaseAmount),0) +  coalesce(SUM(ANP_Settlements_Claim.GstAmount),0)) as 'SettledAmt',
-                    coalesce(SUM(ANP_Settlements_Claim.ApprovedAmount),0)  as 'ApprovedAmt', coalesce(SUM(ANP_Settlements_Claim.VerifiedAmount),0)  as 'VerifyAmt'  FROM ANP_Settlements LEFT JOIN APACTIVITYTYPEMASTER ON ANP_Settlements.ActivityId=APACTIVITYTYPEMASTER.ID 
-                    LEFT JOIN APSUBACTIVITYMASTER ON ANP_Settlements.SubActivityId=APSUBACTIVITYMASTER.ID 
-                    LEFT JOIN ANP_Settlements_Claim ON ANP_Settlements.SId=ANP_Settlements_Claim.SId 
-                    WHERE ANP_Settlements.CurrentStatus=1   GROUP BY ANP_Settlements.SId,ANP_Settlements.SCode 
-                    ,ANP_Settlements.SettlementDate, APACTIVITYTYPEMASTER.ACTIVITYTYPE, APSUBACTIVITYMASTER.SUBACTIVITY");
-                    while($rows = sqlsrv_fetch_array($viw_advs)){ 
+                    $viw_adv =sqlsrv_query($conn,$adv_det);
+                    while($rows = sqlsrv_fetch_array($viw_adv)){ 
                     ?>
                       <tr>
                         <td><?php echo ++$i; ?></td>
