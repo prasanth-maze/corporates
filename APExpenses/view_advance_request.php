@@ -1,6 +1,7 @@
 <?php 
   include 'header.php';
   include 'user_filter_access.php';
+  include 'trzmappingemp.php';
 ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <!-- select 2 -->
@@ -436,28 +437,64 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
               $i =0;
               if(isset($_REQUEST['filter']))
               {
+                $from_date = $to_date = $division_id = $region_id = $teritory_id = $status = '';
                 $from_date    = date("Y-m-d", strtotime($_REQUEST['fromdate'])); 
                 $to_date      = date("Y-m-d", strtotime($_REQUEST['todate'])); 
                 $division_id  = $_REQUEST['division_id'];
                 $region_id    = $_REQUEST['region_id'];
                 $teritory_id  = $_REQUEST['teritory_id']; 
                 $status       = $_REQUEST['status'];
+
+
+                $adv_det="SELECT 
+                ANP_Advance.AdvId,ANP_Advance_Amount.ID AS AdvAmtId,
+                ANP_Advance.ReqId,ANP_Advance.ReqRegionName,ANP_Advance.ReqTeritoryName,
+                CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105) as ReqDate,
+                (RASI_POHQTABLE.POHQNAME + ' / ' + RASI_POHQTABLE.POCODE) As AdvanceTo,
+                ANP_Advance_Amount.CropId,APSUBACTIVITYMASTER.SUBACTIVITY,
+                ANP_Advance_Amount.AdvAmount
+                ,ANP_Advance_Amount.ApprovedAmount,
+                coalesce(SUM(ANP_Advance_Payment.AdvPaidAmount),0) as AdvPaidAmount FROM ANP_Advance 
+                LEFT JOIN ANP_Advance_Amount ON ANP_Advance.AdvId=ANP_Advance_Amount.AdvId
+                LEFT JOIN RASI_POHQTABLE ON ANP_Advance.AdvanceTo=RASI_POHQTABLE.POHQCODE
+                LEFT JOIN APSUBACTIVITYMASTER ON ANP_Advance_Amount.SubActivityId=APSUBACTIVITYMASTER.ID
+                LEFT JOIN ANP_Advance_Payment on ANP_Advance_Amount.Id=ANP_Advance_Payment.AdvAmtId
+                WHERE ANP_Advance.CurrentStatus='1' AND ANP_Advance_Amount.CurrentStatus='1'";
+                
+                if($_SESSION['Dcode'] == 'ZM'){
+                  $adv_det.=" AND ANP_Advance.ReqDivisionId IN ($dmall)";
+                }elseif($_SESSION['Dcode'] == 'DBM'){
+                  $adv_det.=" AND ANP_Advance.ReqRegionId IN ($rgall)";
+                }elseif($_SESSION['Dcode'] == 'TM'){
+                  $adv_det.=" AND ANP_Advance.ReqTeritoryId IN ($tmall)";
+                }
                 if(!empty($from_date)) {
-                  $viw_adv.="Cus_Branch	='$branch'";
+                  $adv_det.="AND ANP_Advance.ReqDate BETWEEN '$from_date' AND '$to_date'";
                 }
                 if(!empty($division_id)) {
-                  $viw_adv.="Cus_Branch	='$branch'";
+                  $adv_det.="AND ANP_Advance.ReqDivisionId='$division_id'";
                 }
                 if(!empty($region_id)) {
-                  $viw_adv.="Cus_Branch	='$branch'";
+                  $adv_det.="AND ANP_Advance.ReqRegionId='$region_id'";
                 }
                 if(!empty($teritory_id)) {
-                  $viw_adv.="Cus_Branch	='$branch'";
+                  $adv_det.="AND ANP_Advance.ReqTeritoryId='$teritory_id'";
                 }
                 if(!empty($status)) {
-                  $viw_adv.="Cus_Branch	='$branch'";
+                  // $viw_adv.="Cus_Branch	='$branch'";
                 }
 					 
+                $adv_det.=" GROUP BY 
+                ANP_Advance.AdvId,
+                ANP_Advance_Amount.ID,
+                ANP_Advance.ReqId,
+                ANP_Advance.ReqRegionName,
+                ANP_Advance.ReqTeritoryName,
+                CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105),
+                RASI_POHQTABLE.POHQNAME + ' / ' + RASI_POHQTABLE.POCODE,
+                ANP_Advance_Amount.ID,ANP_Advance_Amount.CropId,APSUBACTIVITYMASTER.SUBACTIVITY,
+                ANP_Advance_Amount.AdvAmount,ANP_Advance_Amount.ApprovedAmount";
+                
               }else{
 
                 $adv_det="SELECT 
@@ -473,19 +510,15 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                 LEFT JOIN RASI_POHQTABLE ON ANP_Advance.AdvanceTo=RASI_POHQTABLE.POHQCODE
                 LEFT JOIN APSUBACTIVITYMASTER ON ANP_Advance_Amount.SubActivityId=APSUBACTIVITYMASTER.ID
                 LEFT JOIN ANP_Advance_Payment on ANP_Advance_Amount.Id=ANP_Advance_Payment.AdvAmtId
-                WHERE ANP_Advance.CurrentStatus='1' AND ANP_Advance_Amount.CurrentStatus='1'
-                ";
-                
-                /* if($_SESSION['Dcode'] == 'ZM'){
-                  $adv_det.=" AND ";
-                }elseif($_SESSION['Dcode'] == 'RBM'){
-                  $adv_det.=" AND ";
+                WHERE ANP_Advance.CurrentStatus='1' AND ANP_Advance_Amount.CurrentStatus='1'";
+                if($_SESSION['Dcode'] == 'ZM'){
+                  $adv_det.=" AND ANP_Advance.ReqDivisionId IN ($dmall)";
                 }elseif($_SESSION['Dcode'] == 'DBM'){
-                  $adv_det.=" AND ";
+                  $adv_det.=" AND ANP_Advance.ReqRegionId IN ($rgall)";
                 }elseif($_SESSION['Dcode'] == 'TM'){
-                  $adv_det.=" AND Created_at=''";
-                } */
-                $adv_det.="GROUP BY 
+                  $adv_det.=" AND ANP_Advance.ReqTeritoryId IN ($tmall)";
+                }
+                $adv_det.=" GROUP BY 
                 ANP_Advance.AdvId,
                 ANP_Advance_Amount.ID,
                 ANP_Advance.ReqId,

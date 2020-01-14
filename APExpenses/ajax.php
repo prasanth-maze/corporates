@@ -5,7 +5,7 @@ $_SESSION['status'];  // Status = 0
 $_SESSION['Dcode'];   // Dcode -- Designation Code
 $_SESSION['Name'];    // Name of emp
 $_SESSION['finRights'];  // finRights  = 0 or 1
-
+if(isset($_REQUEST['action_emp'])){ $action_emp  = $_REQUEST['action_emp']; } else{ $action_emp  = ''; }
 $action_type = $_REQUEST['action_type'];
 if($action_type == 'GET_REG' && $_REQUEST['division_id'] != ''){
   if($_SESSION['Dcode'] == 'RBM'){
@@ -40,7 +40,7 @@ if($action_type == 'GET_TM'  && $_REQUEST['region_id'] != ''){
 }
 
 
-if( $_REQUEST['action_emp'] =='GET_EMP_DETAILS' && $action_type != ''  &&  $_REQUEST['teritory_id'] != '' ){
+if($action_emp =='GET_EMP_DETAILS' && $action_type != ''  &&  $_REQUEST['teritory_id'] != '' ){
 
   if($action_type == 'GET_REG'){
     $teritory =sqlsrv_query($conn,"SELECT DISTINCT DBMID As EMPID,DBMNAME  AS EMPNAME FROM RASI_ZONETABLE WHERE ZONEID= '".$_REQUEST['teritory_id']."'");

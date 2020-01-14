@@ -1,6 +1,7 @@
 <?php 
 include 'header.php';
 include 'user_filter_access.php';
+include 'trzmappingemp.php';
 ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <!-- select 2 -->
@@ -428,29 +429,90 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                     <tbody>
                     <?php 
                     $i =0;
-                    $viw_adv =sqlsrv_query($conn,"SELECT 
-                            ANP_Advance.AdvId,
-                            ANP_Advance.ReqId,
-                            CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105) as ReqDate,
-                            ANP_Advance.ReqDivisionName,
-                            ANP_Advance.ReqRegionName,
-                            ANP_Advance.ReqTeritoryName,
-                            SUM(ANP_Advance_Amount.AdvAmount) as 'ReqAmt',
-                            SUM(ANP_Advance_Amount.ApprovedAmount) as 'ApprovedAmt' ,
-                            SUM(ANP_Advance_Payment.AdvPaidAmount) as 'PaidAmt' 
-                            FROM ANP_Advance 
-                            LEFT JOIN ANP_Advance_Amount on ANP_Advance.AdvId=ANP_Advance_Amount.AdvID
-                            LEFT JOIN ANP_Advance_Payment on ANP_Advance_Amount.Id=ANP_Advance_Payment.AdvAmtId
-                            WHERE
-                            ANP_Advance.CurrentStatus=1 and 
-                            ANP_Advance_Amount.CurrentStatus=1 group by 
-                            ANP_Advance.AdvId,
-                            ANP_Advance.ReqId,
-                            ANP_Advance.ReqDate,
-                            ANP_Advance.ReqDivisionName,
-                            ANP_Advance.ReqRegionName,
-                            ANP_Advance.ReqTeritoryName");  
-                    while($rows = sqlsrv_fetch_array($viw_adv)){ 
+          if(isset($_REQUEST['filter']))  {
+
+            $from_date = $to_date = $division_id = $region_id = $teritory_id = $status = '';
+            $from_date    = date("Y-m-d", strtotime($_REQUEST['fromdate'])); 
+            $to_date      = date("Y-m-d", strtotime($_REQUEST['todate'])); 
+            $division_id  = $_REQUEST['division_id'];
+            $region_id    = $_REQUEST['region_id'];
+            $teritory_id  = $_REQUEST['teritory_id']; 
+            $status       = $_REQUEST['status'];
+
+        $adv_det="SELECT ANP_Advance.AdvId,ANP_Advance.ReqId, CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105) as ReqDate,
+                ANP_Advance.ReqDivisionName, ANP_Advance.ReqRegionName,ANP_Advance.ReqTeritoryName,
+                SUM(ANP_Advance_Amount.AdvAmount) as 'ReqAmt',
+                SUM(ANP_Advance_Amount.ApprovedAmount) as 'ApprovedAmt' ,
+                SUM(ANP_Advance_Payment.AdvPaidAmount) as 'PaidAmt' 
+                FROM ANP_Advance 
+                LEFT JOIN ANP_Advance_Amount on ANP_Advance.AdvId=ANP_Advance_Amount.AdvID
+                LEFT JOIN ANP_Advance_Payment on ANP_Advance_Amount.Id=ANP_Advance_Payment.AdvAmtId
+                WHERE ANP_Advance.CurrentStatus=1 and ANP_Advance_Amount.CurrentStatus=1 ";
+                    
+                if($_SESSION['Dcode'] == 'ZM'){
+                  $adv_det.=" AND ANP_Advance.ReqDivisionId IN ($dmall)";
+                }elseif($_SESSION['Dcode'] == 'DBM'){
+                  $adv_det.=" AND ANP_Advance.ReqRegionId IN ($rgall)";
+                }elseif($_SESSION['Dcode'] == 'TM'){
+                  $adv_det.=" AND ANP_Advance.ReqTeritoryId IN ($tmall)";
+                }
+                if(!empty($from_date)) {
+                  $adv_det.="AND ANP_Advance.ReqDate BETWEEN '$from_date' AND '$to_date'";
+                }
+                if(!empty($division_id)) {
+                  $adv_det.="AND ANP_Advance.ReqDivisionId='$division_id'";
+                }
+                if(!empty($region_id)) {
+                  $adv_det.="AND ANP_Advance.ReqRegionId='$region_id'";
+                }
+                if(!empty($teritory_id)) {
+                  $adv_det.="AND ANP_Advance.ReqTeritoryId='$teritory_id'";
+                }
+                if(!empty($status)) {
+                  // $viw_adv.="Cus_Branch	='$branch'";
+                }
+					 
+                $adv_det.=" GROUP BY 
+                ANP_Advance.AdvId,
+                ANP_Advance.ReqId,
+                ANP_Advance.ReqDate,
+                ANP_Advance.ReqDivisionName,
+                ANP_Advance.ReqRegionName,
+                ANP_Advance.ReqTeritoryName"; 
+
+
+          }else{
+          
+          $adv_det="SELECT ANP_Advance.AdvId,ANP_Advance.ReqId,
+                    CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105) as ReqDate,
+                    ANP_Advance.ReqDivisionName,
+                    ANP_Advance.ReqRegionName,
+                    ANP_Advance.ReqTeritoryName,
+                    SUM(ANP_Advance_Amount.AdvAmount) as 'ReqAmt',
+                    SUM(ANP_Advance_Amount.ApprovedAmount) as 'ApprovedAmt' ,
+                    SUM(ANP_Advance_Payment.AdvPaidAmount) as 'PaidAmt' 
+                    FROM ANP_Advance 
+                    LEFT JOIN ANP_Advance_Amount on ANP_Advance.AdvId=ANP_Advance_Amount.AdvID
+                    LEFT JOIN ANP_Advance_Payment on ANP_Advance_Amount.Id=ANP_Advance_Payment.AdvAmtId
+                    WHERE ANP_Advance.CurrentStatus=1 and ANP_Advance_Amount.CurrentStatus=1 ";
+                    
+                    if($_SESSION['Dcode'] == 'ZM'){
+                      $adv_det.=" AND ANP_Advance.ReqDivisionId IN ($dmall)";
+                    }elseif($_SESSION['Dcode'] == 'DBM'){
+                      $adv_det.=" AND ANP_Advance.ReqRegionId IN ($rgall)";
+                    }elseif($_SESSION['Dcode'] == 'TM'){
+                      $adv_det.=" AND ANP_Advance.ReqTeritoryId IN ($tmall)";
+                    }
+                    $adv_det.=" GROUP BY 
+                    ANP_Advance.AdvId,
+                    ANP_Advance.ReqId,
+                    ANP_Advance.ReqDate,
+                    ANP_Advance.ReqDivisionName,
+                    ANP_Advance.ReqRegionName,
+                    ANP_Advance.ReqTeritoryName"; 
+                  }
+                  $viw_adv =sqlsrv_query($conn,$adv_det);
+                  while($rows = sqlsrv_fetch_array($viw_adv)){ 
                       if($rows['ApprovedAmt'] != null){
                         continue;
                       }

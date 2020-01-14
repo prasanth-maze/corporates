@@ -413,7 +413,8 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                     <thead>
                         <tr>
                            <th>S.No.</th>
-                           <th>Claim. Id</th>
+                           <th>Claim Id</th>
+                           <th>Claim Date</th>
                            <th>Activity</th>
                            <th>Sub-Activity</th>
                            <th>Exp. Category</th>
@@ -431,6 +432,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                     $i=0;
                     $viw_adv =sqlsrv_query($conn,"SELECT 
                     ANP_Settlements.SCode,
+                    CONVERT (NVARCHAR(50),ANP_Settlements.SettlementDate,105) as SettlementDate,
                     APACTIVITYTYPEMASTER.ACTIVITYTYPE ,
                     APSUBACTIVITYMASTER.SUBACTIVITY,
                     ANP_Claim_Expenses_Category.ExpenseCategoryName,
@@ -449,6 +451,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                     ANP_Settlements.CurrentStatus=1 AND 
                     ANP_Settlements_Claim.CurrentStatus=1 GROUP BY 
                     ANP_Settlements.SCode,
+                    CONVERT (NVARCHAR(50),ANP_Settlements.SettlementDate,105),
                     APACTIVITYTYPEMASTER.ACTIVITYTYPE ,
                     APSUBACTIVITYMASTER.SUBACTIVITY,
                     ANP_Claim_Expenses_Category.ExpenseCategoryName,
@@ -461,6 +464,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                       <tr>
                         <td><?php echo ++$i; ?></td>
                         <td><?php echo $rows['SCode']; ?></td>
+                        <td><?php echo $rows['SettlementDate']; ?></td>
                         <td><?php echo $rows['ACTIVITYTYPE']; ?></td>
                         <td><?php echo $rows['SUBACTIVITY']; ?></td>
                         <td><?php echo $rows['ExpenseCategoryName']; ?></td>

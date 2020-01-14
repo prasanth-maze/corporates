@@ -1,6 +1,7 @@
 <?php 
 include 'header.php';
 include 'user_filter_access.php';
+include 'trzmappingemp.php';
 ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <!-- select 2 -->
@@ -430,68 +431,136 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                         </tr>
                     </thead>
                     <tbody>
-                    <?php 
-                    $i =0;
-                    $viw_adv =sqlsrv_query($conn,"SELECT 
-                        ANP_Advance.AdvId,
-                        ANP_Advance.ReqId,
-                        CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105) as ReqDate,
-                        ANP_Advance.ReqDivisionName,
-                        ANP_Advance.ReqRegionName,
-                        ANP_Advance.ReqTeritoryName,
-                        SUM(ANP_Advance_Amount.AdvAmount) as 'ReqAmt',
-                        SUM(ANP_Advance_Amount.ApprovedAmount) as 'ApprovedAmt' 
-                        FROM ANP_Advance 
-                        LEFT JOIN ANP_Advance_Amount on ANP_Advance.AdvId=ANP_Advance_Amount.AdvID
-                        WHERE
-                        ANP_Advance.CurrentStatus=1 AND 
-                        ANP_Advance_Amount.CurrentStatus=1 
-                        GROUP BY 
-                        ANP_Advance.AdvId,
-                        ANP_Advance.ReqId,
-                        ANP_Advance.ReqDate,
-                        ANP_Advance.ReqDivisionName,
-                        ANP_Advance.ReqRegionName,
-                        ANP_Advance.ReqTeritoryName");  
-                    while($rows = sqlsrv_fetch_array($viw_adv)){ 
-                      if($rows['ApprovedAmt'] == null){
-                        continue;
-                      }
-                      $adv_idss =  $rows['AdvId'];
+                <?php 
+                $i =0;
+                if(isset($_REQUEST['filter']))  {
 
-              $viw_advs =sqlsrv_query($conn,"SELECT SUM(ANP_Advance_Payment.AdvPaidAmount) as PaidAmt FROM ANP_Advance_Payment WHERE ANP_Advance_Payment.CurrentStatus=1 AND ANP_Advance_Payment.AdvId='$adv_idss'");  
-              $rows_paid = sqlsrv_fetch_array($viw_advs);
-              $viw_advs1 =sqlsrv_query($conn,"SELECT SUM(ANP_Settlements_AdvanceRef.VerifiedAmount) as VerifiedAmount FROM ANP_Settlements_AdvanceRef WHERE ANP_Settlements_AdvanceRef.CurrentStatus=1 AND ANP_Settlements_AdvanceRef.AdvId='$adv_idss'");  
-              $rows_settle = sqlsrv_fetch_array($viw_advs1);
-                      $i++;
-                    ?>
-                      <tr>
-                        <td><?php echo $i; ?></td>
-                        <td><?php echo $rows['ReqId']; ?></td>
-                        <td><?php echo $rows['ReqDate']; ?></td>
-                        <td><?php echo $rows['ReqDivisionName']; ?></td>
-                        <td><?php echo $rows['ReqRegionName']; ?></td>
-                        <td><?php echo $rows['ReqTeritoryName']; ?></td>
-                        <td align="right"><?php echo $rows['ReqAmt']; ?></td>
-                        <td align="right"><?php echo $rows['ApprovedAmt']; ?></td>
-                        <td align="right"><?php echo $rows_paid['PaidAmt']; ?></td>
-                        <td align="right"><?php echo $rows['ApprovedAmt'] - $rows_paid['PaidAmt']; ?></td>
-                        <td align="right"><?php echo $rows_settle['VerifiedAmount']; ?></td>
-                        <td>
-                        <?php if($rows['ApprovedAmt'] > $rows_paid['PaidAmt']){ ?> 
-                          <a href="request_adv_payment.php?Advid=<?php echo $rows['AdvId']; ?>">&nbsp;Payment&nbsp;</a>
-                        <?php }else{ ?>
-                          Payment Completed
-                        <?php } ?>
-                        </td>
-                        <td>
-                        <input class="permanent_id" type="hidden" name="permanent_id" value="<?php echo $rows['AdvId']; ?>">
-										      <a class="edit_btn">View Details</a>
-                          </td>
-                      </tr>
-                    <?php  } ?>
-                    </tbody>
-                </table>
+                  $from_date = $to_date = $division_id = $region_id = $teritory_id = $status = '';
+                  $from_date    = date("Y-m-d", strtotime($_REQUEST['fromdate'])); 
+                  $to_date      = date("Y-m-d", strtotime($_REQUEST['todate'])); 
+                  $division_id  = $_REQUEST['division_id'];
+                  $region_id    = $_REQUEST['region_id'];
+                  $teritory_id  = $_REQUEST['teritory_id']; 
+                  $status       = $_REQUEST['status'];
+                              
+                  $adv_det="SELECT 
+                  ANP_Advance.AdvId,
+                  ANP_Advance.ReqId,
+                  CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105) as ReqDate,
+                  ANP_Advance.ReqDivisionName,
+                  ANP_Advance.ReqRegionName,
+                  ANP_Advance.ReqTeritoryName,
+                  SUM(ANP_Advance_Amount.AdvAmount) as 'ReqAmt',
+                  SUM(ANP_Advance_Amount.ApprovedAmount) as 'ApprovedAmt' 
+                  FROM ANP_Advance 
+                  LEFT JOIN ANP_Advance_Amount on ANP_Advance.AdvId=ANP_Advance_Amount.AdvID
+                  WHERE
+                  ANP_Advance.CurrentStatus=1 AND 
+                  ANP_Advance_Amount.CurrentStatus=1";
+
+                        
+                    if($_SESSION['Dcode'] == 'ZM'){
+                      $adv_det.=" AND ANP_Advance.ReqDivisionId IN ($dmall)";
+                    }elseif($_SESSION['Dcode'] == 'DBM'){
+                      $adv_det.=" AND ANP_Advance.ReqRegionId IN ($rgall)";
+                    }elseif($_SESSION['Dcode'] == 'TM'){
+                      $adv_det.=" AND ANP_Advance.ReqTeritoryId IN ($tmall)";
+                    }
+                    if(!empty($from_date)) {
+                      $adv_det.="AND ANP_Advance.ReqDate BETWEEN '$from_date' AND '$to_date'";
+                    }
+                    if(!empty($division_id)) {
+                      $adv_det.="AND ANP_Advance.ReqDivisionId='$division_id'";
+                    }
+                    if(!empty($region_id)) {
+                      $adv_det.="AND ANP_Advance.ReqRegionId='$region_id'";
+                    }
+                    if(!empty($teritory_id)) {
+                      $adv_det.="AND ANP_Advance.ReqTeritoryId='$teritory_id'";
+                    }
+                    if(!empty($status)) {
+                      // $viw_adv.="Cus_Branch	='$branch'";
+                    }
+              
+                $adv_det.="GROUP BY ANP_Advance.AdvId,
+                          ANP_Advance.ReqId,
+                          ANP_Advance.ReqDate,
+                          ANP_Advance.ReqDivisionName,
+                          ANP_Advance.ReqRegionName,
+                          ANP_Advance.ReqTeritoryName";  
+                  
+                }else{
+
+                  $adv_det="SELECT 
+                  ANP_Advance.AdvId,
+                  ANP_Advance.ReqId,
+                  CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105) as ReqDate,
+                  ANP_Advance.ReqDivisionName,
+                  ANP_Advance.ReqRegionName,
+                  ANP_Advance.ReqTeritoryName,
+                  SUM(ANP_Advance_Amount.AdvAmount) as 'ReqAmt',
+                  SUM(ANP_Advance_Amount.ApprovedAmount) as 'ApprovedAmt' 
+                  FROM ANP_Advance 
+                  LEFT JOIN ANP_Advance_Amount on ANP_Advance.AdvId=ANP_Advance_Amount.AdvID
+                  WHERE
+                  ANP_Advance.CurrentStatus=1 AND 
+                  ANP_Advance_Amount.CurrentStatus=1";
+
+                if($_SESSION['Dcode'] == 'ZM'){
+                  $adv_det.=" AND ANP_Advance.ReqDivisionId IN ($dmall)";
+                }elseif($_SESSION['Dcode'] == 'DBM'){
+                  $adv_det.=" AND ANP_Advance.ReqRegionId IN ($rgall)";
+                }elseif($_SESSION['Dcode'] == 'TM'){
+                  $adv_det.=" AND ANP_Advance.ReqTeritoryId IN ($tmall)";
+                }
+                $adv_det.="GROUP BY 
+                ANP_Advance.AdvId,
+                ANP_Advance.ReqId,
+                ANP_Advance.ReqDate,
+                ANP_Advance.ReqDivisionName,
+                ANP_Advance.ReqRegionName,
+                ANP_Advance.ReqTeritoryName"; 
+                }          
+                $viw_adv =sqlsrv_query($conn,$adv_det);
+                while($rows = sqlsrv_fetch_array($viw_adv)){ 
+                  if($rows['ApprovedAmt'] == null){
+                    continue;
+                  }
+                  $adv_idss =  $rows['AdvId'];
+
+          $viw_advs =sqlsrv_query($conn,"SELECT SUM(ANP_Advance_Payment.AdvPaidAmount) as PaidAmt FROM ANP_Advance_Payment WHERE ANP_Advance_Payment.CurrentStatus=1 AND ANP_Advance_Payment.AdvId='$adv_idss'");  
+          $rows_paid = sqlsrv_fetch_array($viw_advs);
+          $viw_advs1 =sqlsrv_query($conn,"SELECT SUM(ANP_Settlements_AdvanceRef.VerifiedAmount) as VerifiedAmount FROM ANP_Settlements_AdvanceRef WHERE ANP_Settlements_AdvanceRef.CurrentStatus=1 AND ANP_Settlements_AdvanceRef.AdvId='$adv_idss'");  
+          $rows_settle = sqlsrv_fetch_array($viw_advs1);
+                  $i++;
+                ?>
+                  <tr>
+                    <td><?php echo $i; ?></td>
+                    <td><?php echo $rows['ReqId']; ?></td>
+                    <td><?php echo $rows['ReqDate']; ?></td>
+                    <td><?php echo $rows['ReqDivisionName']; ?></td>
+                    <td><?php echo $rows['ReqRegionName']; ?></td>
+                    <td><?php echo $rows['ReqTeritoryName']; ?></td>
+                    <td align="right"><?php echo $rows['ReqAmt']; ?></td>
+                    <td align="right"><?php echo $rows['ApprovedAmt']; ?></td>
+                    <td align="right"><?php echo $rows_paid['PaidAmt']; ?></td>
+                    <td align="right"><?php echo $rows['ApprovedAmt'] - $rows_paid['PaidAmt']; ?></td>
+                    <td align="right"><?php echo $rows_settle['VerifiedAmount']; ?></td>
+                    <td>
+                    <?php if($rows['ApprovedAmt'] > $rows_paid['PaidAmt']){ ?> 
+                      <a href="request_adv_payment.php?Advid=<?php echo $rows['AdvId']; ?>">&nbsp;Payment&nbsp;</a>
+                    <?php }else{ ?>
+                      Payment Completed
+                    <?php } ?>
+                    </td>
+                    <td>
+                    <input class="permanent_id" type="hidden" name="permanent_id" value="<?php echo $rows['AdvId']; ?>">
+                      <a class="edit_btn">View Details</a>
+                      </td>
+                  </tr>
+                <?php  } ?>
+                </tbody>
+            </table>
               </div>
           </div>
         </div>
