@@ -476,7 +476,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                 WHERE ANP_Advance.CurrentStatus='1' AND ANP_Advance_Amount.CurrentStatus='1'
                 ";
                 
-                if($_SESSION['Dcode'] == 'ZM'){
+                /* if($_SESSION['Dcode'] == 'ZM'){
                   $adv_det.=" AND ";
                 }elseif($_SESSION['Dcode'] == 'RBM'){
                   $adv_det.=" AND ";
@@ -484,7 +484,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                   $adv_det.=" AND ";
                 }elseif($_SESSION['Dcode'] == 'TM'){
                   $adv_det.=" AND Created_at=''";
-                }
+                } */
                 $adv_det.="GROUP BY 
                 ANP_Advance.AdvId,
                 ANP_Advance_Amount.ID,

@@ -1,5 +1,6 @@
 <?php 
 include 'header.php';
+include 'user_filter_access.php';
 ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <!-- select 2 -->
@@ -312,9 +313,11 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
 
     <div id="collapseOne" class="collapse " aria-labelledby="headingOne" data-parent="#accordion">
       <div class="card-body">
-        <form>
+      <form method="POST" enctype="multipart/form-data" >
+      <input type="hidden" class="login_type" value="<?php echo $_SESSION['Dcode']?>" readonly>
+
         <div class="row">
-            <div class="col-md-5 mt-1">
+            <div class="col-md-5 my-1">
               <div class="row">
                 <label class="col-md-3">Request Date</label>
                 <div class="col-md-9">
@@ -335,50 +338,61 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
             </div>
             </div>
           <div class="row">
-            <div class="col-md-5 mt-1">
+            <div class="col-md-5 my-1">
               <div class="row">
                 <label class="col-md-3">Division</label>
                 <div class="col-md-9">
-                <select class="js-example-basic-single col-xs-12 cls_division" name="division_id" onchange="get_region(this.value);">
+                <select class="js-example-basic-single col-xs-12 cls_division div_select" name="division_id" onchange="get_region(this.value);">
+                  <option value="">  Select Divison  </option>
                   <?php
-                          $divsion =sqlsrv_query($conn,"SELECT DISTINCT $TRZMapping.ZONEID,$zmtbl.ZONENAME  FROM $TRZMapping LEFT JOIN $zmtbl on $TRZMapping.ZONEID=$zmtbl.ZoneID");
-                          while($row = sqlsrv_fetch_array($divsion)){
-                      ?>
-                      <option value="<?php echo $row['ZONEID']; ?>"> <?php echo $row['ZONENAME']; ?> </option>
+                    if($_SESSION['Dcode'] == 'ZM'){
+                      $divsion =sqlsrv_query($conn,"SELECT DISTINCT ZONEID,ZONENAME  FROM RASI_ZONETABLE WHERE DBMID='".$_SESSION['EmpID']."'");
+                    }else{
+                      $divsion =sqlsrv_query($conn,"SELECT DISTINCT $TRZMapping.ZONEID,$zmtbl.ZONENAME  FROM $TRZMapping LEFT JOIN $zmtbl on $TRZMapping.ZONEID=$zmtbl.ZoneID");
+                    }
+                    while($row = sqlsrv_fetch_array($divsion)){
+                  ?>
+                  <option value="<?php echo $row['ZONEID']; ?>" <?php if(isset($zone_ids) && $zone_ids == $row['ZONEID']){ echo 'Selected'; }?>> <?php echo $row['ZONENAME']; ?> </option>
                     <?php } ?>
                   </select>
+                  <input type="hidden" name="division_id" class="div_text" value="<?php echo isset($zone_ids) ? $zone_ids : ""; ?>" disabled/>
                 </div>
               </div>
             </div>
 
-            <div class="col-md-5 mt-1">
+            <div class="col-md-5 my-1">
               <div class="row">
                 <label class="col-md-3">Region</label>
                 <div class="col-md-9">
-                <select class="js-example-basic-single col-xs-12 cls_region" name="region_id" onchange="get_teritory(this.value);" >
-                    <option value="">Select </option>
-                    </select>
+                <select class="js-example-basic-single col-xs-12 required_for_valid cls_region reg_select" name="region_id" onchange="get_teritory(this.value);document.getElementById('reg_name').value=this.options[this.selectedIndex].text" >
+                <option value="">Select </option>
+                </select>
+                <input type="hidden" name="region_id" class="reg_text" value="<?php echo isset($region_ids) ? $region_ids : ""; ?>" disabled/>
                 </div>
               </div>
             </div>
 
-            <div class="col-md-5 mt-1">
+            <div class="col-md-5 my-1">
               <div class="row">
                 <label class="col-md-3">Territory</label>
                 <div class="col-md-9">
-                    <select class="js-example-basic-single col-xs-12 cls_teritory" name="teritory_id" onchange="get_employee(this.value);">
-                    <option value="">Select </option>
-                    </select>
+                <select class="js-example-basic-single col-xs-12 required_for_valid cls_teritory" name="teritory_id" 
+                onchange="get_employee('GET_EMP_DETAILS',this.value);document.getElementById('teri_name').value=this.options[this.selectedIndex].text">
+                <option value="">Select </option>
+                </select>
                 </div>
               </div>
             </div>
 
-            <div class="col-md-5 mt-1">
+            <div class="col-md-5 my-1">
               <div class="row">
                 <label class="col-md-3">Status</label>
                 <div class="col-md-9">
-                  <select class="js-example-basic-single">
-                    <option>All</option>
+                  <select class="js-example-basic-single" name="status" >
+                    <option value="0">All</option>
+                    <option value="1">Approved</option>
+                    <option value="2">Pending</option>
+                    <option value="3">Settlement</option>
                     
                   </select>
                 </div>
@@ -386,7 +400,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
             </div>
 
       <div class="col-md-11 ">
-        <input type="submit" class="form-control" />
+        <input type="submit" class="form-control" name="filter" value="Submit">
       </div>
           </div>
         </form> 
@@ -506,6 +520,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
         </div>
 
   <!-- End Modal -->
+  <?php include 'user_filter_access_script.php'; ?>
   <script>
     $(document).ready(function() {
     $('.js-example-basic-single').select2();
