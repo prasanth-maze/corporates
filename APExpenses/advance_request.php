@@ -58,121 +58,131 @@ if($_SESSION['Dcode'] == 'ZM'){
   $url = 'http://' . $_SERVER['HTTP_HOST'];             // Get the server
   $url .= rtrim(dirname($_SERVER['PHP_SELF']), '/\\'); // Get the current directory
              
-if(isset($_REQUEST['submit'])){
-  $created_by      = $_SESSION['EmpID'];
-  $created_at      = date('Y-m-d H:i:s');
-  $request_id      = $_REQUEST['request_id'];
-  $request_date    = date("Y-m-d", strtotime($_REQUEST['request_date']));
-  echo $division_id     = $_REQUEST['division_id'];
-  $region_id       = $_REQUEST['region_id'];
-  $teritory_id     = $_REQUEST['teritory_id'];
-  $emp_id          = $_REQUEST['emp_id']; 
- echo  $division_name   = $_REQUEST['div_name']; exit;
-  $region_name     = $_REQUEST['reg_name'];
-  $teritory_name   = $_REQUEST['teri_name'];
-  $common_remark   = $_REQUEST['common_remark'];
-  $tot_amt         = 0;
-  $crop_id         = array();
-  $activity_id      = array();
-  $sub_activity_id  = array();
-  $avt_amt          = array();
-
-  $crop_id         = $_REQUEST['crop_id']; 
-  $activity_id     = $_REQUEST['activity_id']; 
-  $sub_activity_id = $_REQUEST['sub_activity_id']; 
-  $avt_amt         = $_REQUEST['avt_amt']; 
-  $max_isd =sqlsrv_query($conn,"SELECT COALESCE(MAX(AdvId),0)+1 As res_id FROM $advreques");  
-  $req_detd = sqlsrv_fetch_array($max_isd);
-  $req_idd = $req_detd['res_id'];
-  $request_id      = "ANP/ADV/2019-2020/".''.$req_idd;
-  $insert = sqlsrv_query($conn,"INSERT INTO ANP_Advance(ReqIdPre,ReqId,ReqDate,ReqDivisionId,ReqDivisionName,ReqRegionId,ReqRegionName,ReqTeritoryId,ReqTeritoryName,AdvanceTo,AdvRequestCommonRemark,CreatedBy,CreatedAt ) VALUES ('$request_id','$request_id','$request_date','$division_id','$division_name','$region_id','$region_name','$teritory_id','$teritory_name','$emp_id','$common_remark','$created_by','$created_at')");
-  if($insert){
-    $max_ids  = sqlsrv_query($conn,"SELECT AdvId As max_id FROM ANP_Advance WHERE ReqId = '$request_id'");  
-    $req_dets = sqlsrv_fetch_array($max_ids);
-    $adv_ids = $req_dets['max_id'];
+  if(isset($_REQUEST['submit'])){
+    $created_by      = $_SESSION['EmpID'];
+    $created_at      = date('Y-m-d H:i:s');
+    $request_id      = $_REQUEST['request_id'];
+    $request_date    = date("Y-m-d", strtotime($_REQUEST['request_date']));
+    $division_id     = $_REQUEST['division_id'];
+    $region_id       = $_REQUEST['region_id'];
+    $teritory_id     = $_REQUEST['teritory_id'];
+    $emp_id          = $_REQUEST['emp_id']; 
+    $division_name   = $_REQUEST['div_name'];
+    $region_name     = $_REQUEST['reg_name'];
+    $teritory_name   = $_REQUEST['teri_name'];
+    $common_remark   = $_REQUEST['common_remark'];
+    $tot_amt         = 0;
+    $crop_id         = array();
+    $activity_id      = array();
+    $sub_activity_id  = array();
+    $avt_amt          = array();
   
-    for($i=0,$j=0;$i<sizeof($crop_id);$i++,$j++){
-         $inserta = sqlsrv_query($conn,"INSERT INTO ANP_Advance_Amount(AdvId,CropId,ActivityId,SubActivityId,AdvAmount,CreatedBy,CreatedAt) VALUES ('$adv_ids','$crop_id[$i]','$activity_id[$i]','$sub_activity_id[$i]','$avt_amt[$i]','$created_by','$created_at')"); 
-      $tot_amt = $tot_amt + $avt_amt[$i];
-      }
-    if(sizeof($crop_id) == $j){
-      /*  */
-          $subject  ="INR ".$tot_amt." Advance Request From $created_by";
-          $message 	="<div>
-                        Requested By : $created_by <br/>
-                        Requested For : $emp_id <br/>
-                        Division : $division_name <br/>
-                        Region :  $region_name <br/>
-                        Territory :  $teritory_name <br/>
-                      </div>
-                      <table border='1'>
+    $crop_id         = $_REQUEST['crop_id']; 
+    $activity_id     = $_REQUEST['activity_id']; 
+    $sub_activity_id = $_REQUEST['sub_activity_id']; 
+    $avt_amt         = $_REQUEST['avt_amt']; 
+    $max_isd =sqlsrv_query($conn,"SELECT COALESCE(MAX(AdvId),0)+1 As res_id FROM $advreques");  
+    $req_detd = sqlsrv_fetch_array($max_isd);
+    $req_idd = $req_detd['res_id'];
+    $request_id      = "ANP/ADV/2019-2020/".''.$req_idd;
+    $insert = sqlsrv_query($conn,"INSERT INTO ANP_Advance(ReqIdPre,ReqId,ReqDate,ReqDivisionId,ReqDivisionName,ReqRegionId,ReqRegionName,ReqTeritoryId,ReqTeritoryName,AdvanceTo,AdvRequestCommonRemark,CreatedBy,CreatedAt ) VALUES ('$request_id','$request_id','$request_date','$division_id','$division_name','$region_id','$region_name','$teritory_id','$teritory_name','$emp_id','$common_remark','$created_by','$created_at')");
+    if($insert){
+      $max_ids  = sqlsrv_query($conn,"SELECT AdvId As max_id FROM ANP_Advance WHERE ReqId = '$request_id'");  
+      $req_dets = sqlsrv_fetch_array($max_ids);
+      $adv_ids = $req_dets['max_id'];
+    
+      for($i=0,$j=0;$i<sizeof($crop_id);$i++,$j++){
+           $inserta = sqlsrv_query($conn,"INSERT INTO ANP_Advance_Amount(AdvId,CropId,ActivityId,SubActivityId,AdvAmount,CreatedBy,CreatedAt) VALUES ('$adv_ids','$crop_id[$i]','$activity_id[$i]','$sub_activity_id[$i]','$avt_amt[$i]','$created_by','$created_at')"); 
+        $tot_amt = $tot_amt + $avt_amt[$i];
+        }
+      if(sizeof($crop_id) == $j){
+        
+        /*  */
+            $subject  ="INR ".$tot_amt." Advance Request From $created_by";
+            $message 	="<div>
+                          <table border='0'>
+                              <tr><td>Requested By  </td><td> : </td><td> $created_by</td></tr>
+                              <tr><td>Requested For </td><td> : </td><td> $emp_id</td></tr>
+                              <tr><td>Division      </td><td> : </td><td> $division_name</td></tr>
+                              <tr><td>Region        </td><td> : </td><td> $region_name</td></tr>
+                              <tr> <td>Territory    </td><td> : </td><td> $teritory_name</td></tr>
+                          </table>
+                        </div></br>
+                        <table border='1' >
                         <tr>
-                          <th>Sno</th>
-                          <th>Crop</th>
-                          <th>Activity</th>
-                          <th>Sub Activity</th>
-                          <th>Amount</th>
+                          <th style='padding:5px;'>S.No.</th>
+                          <th style='padding:5px;'>Crop</th>
+                          <th style='padding:5px;'>Activity</th>
+                          <th style='padding:5px;'>Sub Activity</th>
+                          <th align='right' style='padding:5px;'>Req. Amt.</th>
                         </tr>";
-          for($i=0,$j=1;$i<sizeof($crop_id);$i++,$j++){
-        $message.= " <tr>
-                        <td>$j</td>
-                        <td>$crop_id[$i]</td>
-                        <td>$activity_id[$i]</td>
-                        <td>$sub_activity_id[$i]</td>
-                        <td>$avt_amt[$i]</td>
-                      </tr>";
-          }
-          $message.= "<tr>
-                          <td colspan='4'> Total </td>
-                          <td>$tot_amt</td>
-                        </tr></table>";
-                        
-          $message.= "<a href='$url/request_adv_approval.php?Advid=$adv_ids'> Click Here To Approve </a>";          
-          $name 	= "prasanth.p@mazenetsolution.com";
-          $pass		=	"prasanth@12";
-          $to		  =	"prasanth.p@mazenetsolution.com";
-                        	  
-          $mail = new PHPMailer();
-          $mail->CharSet =  "utf-8";
-          $mail->IsSMTP();
-          $mail->SMTPAuth = true;
-          $mail->Username = $name;
-          $mail->Password = $pass;
-          $mail->SMTPSecure = "ssl"; // SSL FROM DATABASE
-          $mail->Host = 	    "smtp.gmail.com";// Host FROM DATABASE
-          $mail->Port = 		"465";// Port FROM DATABASE
-          $mail->setFrom($name);
-          $mail->AddAddress($to);
-          // $mail->addCC('prasanth.p@mazenetsolution.com');
-          // $mail->addBCC('prasanth.p@mazenetsolution.com');
-          $mail->Subject  = $subject;
-          $mail->IsHTML(true);
-          $mail->Body    = $message;
-
-          if($mail->Send())
-          {
-            /* echo "<script type='text/javascript'>alert('Thank You </br> Your Request ID Is $request_id </br> Advance Request is send for Approval')</script>";
-            echo '<script type="text/javascript">window.location.replace("view_advance_request.php");</script>'; */
-            echo "<script>window.location='advance_request.php?request_id=".$request_id."'</script>";
-
-          }else {      
-            echo '<script type="text/javascript">
+                      for($i=0,$j=1;$i<sizeof($crop_id);$i++,$j++){
+                          $viw_adv =sqlsrv_query($conn,"SELECT DISTINCT ACTIVITYTYPE,SUBACTIVITY FROM APSUBACTIVITYMASTER WHERE APSUBACTIVITYMASTER.ID='$sub_activity_id[$i]'");  
+                          $rows             = sqlsrv_fetch_array($viw_adv);
+                          $activity_ids     = $rows['ACTIVITYTYPE'];
+                          $subactivity_ids  = $rows['SUBACTIVITY'];
+                    $message.= " <tr>
+                                    <td style='padding:5px;'>$j</td>
+                                    <td style='padding:5px;'>$crop_id[$i]</td>
+                                    <td style='padding:5px;'>$activity_ids</td>
+                                    <td style='padding:5px;'>$subactivity_ids</td>
+                                    <td align='right' style='padding:5px;'>$avt_amt[$i]</td>
+                                  </tr>";
+                      }
+                      $message.= "<tr>
+                                      <td colspan='4' style='padding:5px;'> <b>Total </b></td>
+                                      <td align='right' style='padding:5px;'><b>$tot_amt </b></td>
+                                    </tr></table>";
+                          
+  
+  
+  
+                          
+            $message.= "</br><a href='$url/request_adv_approval.php?Advid=$adv_ids'> Click Here To Approve </a>";          
+            $name 	= "prasanth.p@mazenetsolution.com";
+            $pass		=	"prasanth@12";
+            $to		  =	"prasanth.p@mazenetsolution.com";
+                              
+            $mail = new PHPMailer();
+            $mail->CharSet =  "utf-8";
+            $mail->IsSMTP();
+            $mail->SMTPAuth = true;
+            $mail->Username = $name;
+            $mail->Password = $pass;
+            $mail->SMTPSecure = "ssl"; // SSL FROM DATABASE
+            $mail->Host = 	    "smtp.gmail.com";// Host FROM DATABASE
+            $mail->Port = 		"465";// Port FROM DATABASE
+            $mail->setFrom($name);
+            $mail->AddAddress($to);
+            // $mail->addCC('prasanth.p@mazenetsolution.com');
+            // $mail->addBCC('prasanth.p@mazenetsolution.com');
+            $mail->Subject  = $subject;
+            $mail->IsHTML(true);
+            $mail->Body    = $message;
+  
+            if($mail->Send())
+            {
+              /* echo "<script type='text/javascript'>alert('Thank You </br> Your Request ID Is $request_id </br> Advance Request is send for Approval')</script>";
+              echo '<script type="text/javascript">window.location.replace("view_advance_request.php");</script>'; */
+              echo "<script>window.location='advance_request.php?request_id=".$request_id."'</script>";
+  
+            }else {      
+              echo '<script type="text/javascript">
+                window.location.replace("view_advance_request.php?sts=fail");
+                </script>';
+            }
+      }else{
+          echo '<script type="text/javascript">
               window.location.replace("view_advance_request.php?sts=fail");
-              </script>';
-          }
+          </script>';
+      }
     }else{
-        echo '<script type="text/javascript">
-            window.location.replace("view_advance_request.php?sts=fail");
-        </script>';
+      echo '<script type="text/javascript">
+          window.location.replace("view_advance_request.php?sts=fail");
+      </script>';
     }
-  }else{
-    echo '<script type="text/javascript">
-        window.location.replace("view_advance_request.php?sts=fail");
-    </script>';
   }
-}
-?>
-
+  ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <!-- select 2 -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />

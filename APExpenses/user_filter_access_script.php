@@ -100,22 +100,4 @@ function get_employee(action_type,val) {
         }
     });
 }
-
-$(document).ready(function() {
-    $('.js-example-basic-single').select2();
-});
-
-$(document).ready(function() {
-     $('#DivisionRestbl').DataTable( {
-         orderCellsTop: true,
-         fixedHeader: true,
-         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        //  dom: 'lBfrtip',
-         "scrollX": true,
-         "scrollY":500,
-         buttons: [
-           'colvis'
-       ]
-     } );
- } );
  </script>

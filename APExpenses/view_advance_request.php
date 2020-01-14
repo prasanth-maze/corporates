@@ -389,7 +389,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
               <div class="row">
                 <label class="col-md-3">Status</label>
                 <div class="col-md-9">
-                  <select class="js-example-basic-single">
+                  <select class="js-example-basic-single" name="status" >
                     <option value="0">All</option>
                     <option value="1">Approved</option>
                     <option value="2">Pending</option>
@@ -401,7 +401,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
             </div>
 
       <div class="col-md-11 ">
-        <input type="submit" class="form-control" />
+        <input type="submit" class="form-control" name="filter" value="Submit">
       </div>
           </div>
         </form> 
@@ -431,34 +431,72 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                   </tr>
               </thead>
               <tbody>
+              
               <?php 
               $i =0;
-              $viw_adv =sqlsrv_query($conn,"SELECT 
-              ANP_Advance.AdvId,ANP_Advance_Amount.ID AS AdvAmtId,
-              ANP_Advance.ReqId,ANP_Advance.ReqRegionName,ANP_Advance.ReqTeritoryName,
-              CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105) as ReqDate,
-              (RASI_POHQTABLE.POHQNAME + ' / ' + RASI_POHQTABLE.POCODE) As AdvanceTo,
-              ANP_Advance_Amount.CropId,APSUBACTIVITYMASTER.SUBACTIVITY,
-              ANP_Advance_Amount.AdvAmount
-              ,ANP_Advance_Amount.ApprovedAmount,
-              coalesce(SUM(ANP_Advance_Payment.AdvPaidAmount),0) as AdvPaidAmount FROM ANP_Advance 
-              LEFT JOIN ANP_Advance_Amount ON ANP_Advance.AdvId=ANP_Advance_Amount.AdvId
-              LEFT JOIN RASI_POHQTABLE ON ANP_Advance.AdvanceTo=RASI_POHQTABLE.POHQCODE
-              LEFT JOIN APSUBACTIVITYMASTER ON ANP_Advance_Amount.SubActivityId=APSUBACTIVITYMASTER.ID
-              LEFT JOIN ANP_Advance_Payment on ANP_Advance_Amount.Id=ANP_Advance_Payment.AdvAmtId
-              WHERE ANP_Advance.CurrentStatus='1' AND ANP_Advance_Amount.CurrentStatus='1'
-              GROUP BY 
-              ANP_Advance.AdvId,
-              ANP_Advance_Amount.ID,
-              ANP_Advance.ReqId,
-              ANP_Advance.ReqRegionName,
-              ANP_Advance.ReqTeritoryName,
-              CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105),
-              RASI_POHQTABLE.POHQNAME + ' / ' + RASI_POHQTABLE.POCODE,
-              ANP_Advance_Amount.ID,ANP_Advance_Amount.CropId,APSUBACTIVITYMASTER.SUBACTIVITY,
-              ANP_Advance_Amount.AdvAmount
-              ,ANP_Advance_Amount.ApprovedAmount
-              ");  
+              if(isset($_REQUEST['filter']))
+              {
+                $from_date    = date("Y-m-d", strtotime($_REQUEST['fromdate'])); 
+                $to_date      = date("Y-m-d", strtotime($_REQUEST['todate'])); 
+                $division_id  = $_REQUEST['division_id'];
+                $region_id    = $_REQUEST['region_id'];
+                $teritory_id  = $_REQUEST['teritory_id']; 
+                $status       = $_REQUEST['status'];
+                if(!empty($from_date)) {
+                  $viw_adv.="Cus_Branch	='$branch'";
+                }
+                if(!empty($division_id)) {
+                  $viw_adv.="Cus_Branch	='$branch'";
+                }
+                if(!empty($region_id)) {
+                  $viw_adv.="Cus_Branch	='$branch'";
+                }
+                if(!empty($teritory_id)) {
+                  $viw_adv.="Cus_Branch	='$branch'";
+                }
+                if(!empty($status)) {
+                  $viw_adv.="Cus_Branch	='$branch'";
+                }
+					 
+              }else{
+
+                $adv_det="SELECT 
+                ANP_Advance.AdvId,ANP_Advance_Amount.ID AS AdvAmtId,
+                ANP_Advance.ReqId,ANP_Advance.ReqRegionName,ANP_Advance.ReqTeritoryName,
+                CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105) as ReqDate,
+                (RASI_POHQTABLE.POHQNAME + ' / ' + RASI_POHQTABLE.POCODE) As AdvanceTo,
+                ANP_Advance_Amount.CropId,APSUBACTIVITYMASTER.SUBACTIVITY,
+                ANP_Advance_Amount.AdvAmount
+                ,ANP_Advance_Amount.ApprovedAmount,
+                coalesce(SUM(ANP_Advance_Payment.AdvPaidAmount),0) as AdvPaidAmount FROM ANP_Advance 
+                LEFT JOIN ANP_Advance_Amount ON ANP_Advance.AdvId=ANP_Advance_Amount.AdvId
+                LEFT JOIN RASI_POHQTABLE ON ANP_Advance.AdvanceTo=RASI_POHQTABLE.POHQCODE
+                LEFT JOIN APSUBACTIVITYMASTER ON ANP_Advance_Amount.SubActivityId=APSUBACTIVITYMASTER.ID
+                LEFT JOIN ANP_Advance_Payment on ANP_Advance_Amount.Id=ANP_Advance_Payment.AdvAmtId
+                WHERE ANP_Advance.CurrentStatus='1' AND ANP_Advance_Amount.CurrentStatus='1'
+                ";
+                
+                if($_SESSION['Dcode'] == 'ZM'){
+                  $adv_det.=" AND ";
+                }elseif($_SESSION['Dcode'] == 'RBM'){
+                  $adv_det.=" AND ";
+                }elseif($_SESSION['Dcode'] == 'DBM'){
+                  $adv_det.=" AND ";
+                }elseif($_SESSION['Dcode'] == 'TM'){
+                  $adv_det.=" AND Created_at=''";
+                }
+                $adv_det.="GROUP BY 
+                ANP_Advance.AdvId,
+                ANP_Advance_Amount.ID,
+                ANP_Advance.ReqId,
+                ANP_Advance.ReqRegionName,
+                ANP_Advance.ReqTeritoryName,
+                CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105),
+                RASI_POHQTABLE.POHQNAME + ' / ' + RASI_POHQTABLE.POCODE,
+                ANP_Advance_Amount.ID,ANP_Advance_Amount.CropId,APSUBACTIVITYMASTER.SUBACTIVITY,
+                ANP_Advance_Amount.AdvAmount,ANP_Advance_Amount.ApprovedAmount";
+              }
+              $viw_adv =sqlsrv_query($conn,$adv_det);
               while($rows = sqlsrv_fetch_array($viw_adv)){ 
                 $i++;
               ?>
@@ -493,6 +531,25 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
 </div>
   <!-- End Modal -->
 <?php include 'user_filter_access_script.php'; ?>
+<script>
+$(document).ready(function() {
+    $('.js-example-basic-single').select2();
+});
+
+$(document).ready(function() {
+     $('#DivisionRestbl').DataTable( {
+         orderCellsTop: true,
+         fixedHeader: true,
+         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        //  dom: 'lBfrtip',
+         "scrollX": true,
+         "scrollY":600,
+         buttons: [
+           'colvis'
+       ]
+     } );
+ } );
+</script>
 <!-- select 2 -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
 <!-- datatables column visibility -->

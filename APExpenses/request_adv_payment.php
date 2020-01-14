@@ -387,8 +387,24 @@ h3.panel-title {
       <?php } ?>
     <!-- End POP UP -->
 <?php   
-  $view_part_adv = sqlsrv_query($conn,"SELECT ANP_Advance.AdvId, ANP_Advance.ReqId, CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105) as ReqDate,ANP_Advance.ReqDivisionName,  ANP_Advance.ReqRegionName, ANP_Advance.ReqTeritoryName,(RASI_POHQTABLE.POHQNAME + ' / ' + RASI_POHQTABLE.POCODE) As AdvanceTo FROM ANP_Advance  LEFT JOIN RASI_POHQTABLE ON ANP_Advance.AdvanceTo=RASI_POHQTABLE.POHQCODE WHERE ANP_Advance.CurrentStatus=1 AND  ANP_Advance.AdvId=$adv_id");  
+  $view_part_adv = sqlsrv_query($conn,"SELECT ANP_Advance.AdvId, ANP_Advance.ReqId, CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105) as ReqDate,ANP_Advance.ReqDivisionName,  ANP_Advance.ReqRegionName, ANP_Advance.ReqTeritoryName,ANP_Advance.AdvanceTo FROM ANP_Advance  LEFT JOIN RASI_POHQTABLE ON ANP_Advance.AdvanceTo=RASI_POHQTABLE.POHQCODE WHERE ANP_Advance.CurrentStatus=1 AND  ANP_Advance.AdvId=$adv_id");  
   $fetch_adv_det = sqlsrv_fetch_array($view_part_adv);
+  $adv_tos = $fetch_adv_det['AdvanceTo'];
+  $emp_tbl        = sqlsrv_query($conn,"SELECT TOP 1 APDESIGN FROM EMPLTABLE WHERE EMPLID='$adv_tos'");  
+  $fetch_emp_tbl  = sqlsrv_fetch_array($emp_tbl);
+  if($fetch_emp_tbl['APDESIGN'] == 'DBM'){
+    $role_tbl        = sqlsrv_query($conn,"SELECT TOP 1 DBMNAME As EmpName FROM RASI_ZONETABLE WHERE DBMID='$adv_tos'");  
+    $fetch_role_tbl  = sqlsrv_fetch_array($role_tbl);
+    $Empnames        = $fetch_role_tbl['EmpName'];
+  }if($fetch_emp_tbl['APDESIGN'] == 'RBM'){
+    $role_tbl        = sqlsrv_query($conn,"SELECT TOP 1 EMPLNAME As EmpName FROM RASI_REGIONTABLE WHERE RBMID='$adv_tos'");  
+    $fetch_role_tbl  = sqlsrv_fetch_array($role_tbl);
+    $Empnames        = $fetch_role_tbl['EmpName'];
+  }if($fetch_emp_tbl['APDESIGN'] == 'TM'){
+    $role_tbl        = sqlsrv_query($conn,"SELECT TOP 1 EMPLNAME As EmpName FROM RASI_TMTABLE WHERE EMPLID='$adv_tos'");  
+    $fetch_role_tbl  = sqlsrv_fetch_array($role_tbl);
+    $Empnames        = $fetch_role_tbl['EmpName'];
+  }
 ?>
     <!-- Page -->
   <div class="page" style="margin-top: 0px !important">
@@ -449,7 +465,7 @@ h3.panel-title {
                   <div class="row">
                     <label class="control-label col-md-3 col-sm-4 col-xs-12" for="name">Advance To</label>
                       <div class="col-md-9 col-sm-8 col-xs-12 ">
-                      <input type="text" class="form-control col-md-12 col-xs-12 required_for_valid" value="<?php echo $fetch_adv_det['AdvanceTo'];?>" readonly>
+                      <input type="text" class="form-control col-md-12 col-xs-12 required_for_valid" value="<?php echo $Empnames;?>" readonly>
                       </div>
                   </div>
                   </div>
@@ -472,15 +488,6 @@ h3.panel-title {
           </thead>
           <tbody>                    
             <?php   $i = $tot_adv_amt = $tot_app_amt  = $tot_paid_amt = $tot_bal_amt = 0;
-              /* $view_activity = sqlsrv_query($conn,"  SELECT ANP_Advance_Amount.Id As adv_amt_id,
-              ANP_Advance_Amount.CropId,  ANP_Advance_Amount.ActivityId,APACTIVITYTYPEMASTER.ACTIVITYTYPE,
-              ANP_Advance_Amount.SubActivityId, APSUBACTIVITYMASTER.SUBACTIVITY, ANP_Advance_Amount.AdvAmount, 
-              ANP_Advance_Amount.ApprovedAmount,ANP_Advance_Amount.ApprovedRemark,ISNULL(ANP_Advance_Payment.AdvPaidAmount,0) As AdvPaidAmount,
-              (ANP_Advance_Amount.ApprovedAmount - ISNULL(ANP_Advance_Payment.AdvPaidAmount,0)) As Balance_Amt  
-              FROM ANP_Advance_Amount LEFT JOIN APACTIVITYTYPEMASTER ON ANP_Advance_Amount.ActivityId=APACTIVITYTYPEMASTER.ID
-              LEFT JOIN APSUBACTIVITYMASTER ON ANP_Advance_Amount.SubActivityId=APSUBACTIVITYMASTER.ID
-              LEFT JOIN ANP_Advance_Payment on ANP_Advance_Amount.Id=ANP_Advance_Payment.AdvAmtId
-              WHERE ANP_Advance_Amount.CurrentStatus=1 AND  ANP_Advance_Amount.AdvId='$adv_id'"); */  
               $view_activity = sqlsrv_query($conn,"SELECT distinct ANP_Advance_Amount.Id As adv_amt_id,ANP_Advance_Amount.AdvId,
               ANP_Advance_Amount.CropId, ANP_Advance_Amount.ActivityId,APACTIVITYTYPEMASTER.ACTIVITYTYPE,
               ANP_Advance_Amount.SubActivityId, APSUBACTIVITYMASTER.SUBACTIVITY, ANP_Advance_Amount.AdvAmount,
