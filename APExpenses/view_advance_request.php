@@ -1,5 +1,6 @@
 <?php 
-include 'header.php';
+  include 'header.php';
+  include 'user_filter_access.php';
 ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <!-- select 2 -->
@@ -314,6 +315,8 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
     <div id="collapseOne" class="collapse " aria-labelledby="headingOne" data-parent="#accordion">
       <div class="card-body">
       <form method="POST" enctype="multipart/form-data" >
+      <input type="hidden" class="login_type" value="<?php echo $_SESSION['Dcode']?>" readonly>
+
         <div class="row">
             <div class="col-md-5 my-1">
               <div class="row">
@@ -340,15 +343,20 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
               <div class="row">
                 <label class="col-md-3">Division</label>
                 <div class="col-md-9">
-                <select class="js-example-basic-single col-xs-12 cls_division" name="division_id" onchange="get_region(this.value);">
-                <option value="">Select </option>
+                <select class="js-example-basic-single col-xs-12 cls_division div_select" name="division_id" onchange="get_region(this.value);">
+                  <option value="">  Select Divison  </option>
                   <?php
-                          $divsion =sqlsrv_query($conn,"SELECT DISTINCT $TRZMapping.ZONEID,$zmtbl.ZONENAME  FROM $TRZMapping LEFT JOIN $zmtbl on $TRZMapping.ZONEID=$zmtbl.ZoneID");
-                          while($row = sqlsrv_fetch_array($divsion)){
-                      ?>
-                      <option value="<?php echo $row['ZONEID']; ?>"> <?php echo $row['ZONENAME']; ?> </option>
+                    if($_SESSION['Dcode'] == 'ZM'){
+                      $divsion =sqlsrv_query($conn,"SELECT DISTINCT ZONEID,ZONENAME  FROM RASI_ZONETABLE WHERE DBMID='".$_SESSION['EmpID']."'");
+                    }else{
+                      $divsion =sqlsrv_query($conn,"SELECT DISTINCT $TRZMapping.ZONEID,$zmtbl.ZONENAME  FROM $TRZMapping LEFT JOIN $zmtbl on $TRZMapping.ZONEID=$zmtbl.ZoneID");
+                    }
+                    while($row = sqlsrv_fetch_array($divsion)){
+                  ?>
+                  <option value="<?php echo $row['ZONEID']; ?>" <?php if(isset($zone_ids) && $zone_ids == $row['ZONEID']){ echo 'Selected'; }?>> <?php echo $row['ZONENAME']; ?> </option>
                     <?php } ?>
                   </select>
+                  <input type="hidden" name="division_id" class="div_text" value="<?php echo isset($zone_ids) ? $zone_ids : ""; ?>" disabled/>
                 </div>
               </div>
             </div>
@@ -357,9 +365,10 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
               <div class="row">
                 <label class="col-md-3">Region</label>
                 <div class="col-md-9">
-                <select class="js-example-basic-single col-xs-12 cls_region" name="region_id" onchange="get_teritory(this.value);" >
-                    <option value="">Select </option>
-                    </select>
+                <select class="js-example-basic-single col-xs-12 required_for_valid cls_region reg_select" name="region_id" onchange="get_teritory(this.value);document.getElementById('reg_name').value=this.options[this.selectedIndex].text" >
+                <option value="">Select </option>
+                </select>
+                <input type="hidden" name="region_id" class="reg_text" value="<?php echo isset($region_ids) ? $region_ids : ""; ?>" disabled/>
                 </div>
               </div>
             </div>
@@ -368,9 +377,10 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
               <div class="row">
                 <label class="col-md-3">Territory</label>
                 <div class="col-md-9">
-                    <select class="js-example-basic-single col-xs-12 cls_teritory" name="teritory_id" onchange="get_employee(this.value);">
-                    <option value="">Select </option>
-                    </select>
+                <select class="js-example-basic-single col-xs-12 required_for_valid cls_teritory" name="teritory_id" 
+                onchange="get_employee('GET_EMP_DETAILS',this.value);document.getElementById('teri_name').value=this.options[this.selectedIndex].text">
+                <option value="">Select </option>
+                </select>
                 </div>
               </div>
             </div>
@@ -380,7 +390,10 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                 <label class="col-md-3">Status</label>
                 <div class="col-md-9">
                   <select class="js-example-basic-single">
-                    <option value="">All</option>
+                    <option value="0">All</option>
+                    <option value="1">Approved</option>
+                    <option value="2">Pending</option>
+                    <option value="3">Settlement</option>
                     
                   </select>
                 </div>
@@ -469,36 +482,17 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                 </tr>
               <?php  } ?>
               </tbody>
-          </table>
-        </div>
-          </div>
-          </div>
+              </table>
+            </div>
+           </div>
+         </div>
         </div>
       </div>
     </div>
   </div>      
-  </div>
+</div>
   <!-- End Modal -->
-<script>
-  $(document).ready(function() {
-    $('.js-example-basic-single').select2();
-  });
-</script>
-<script type="text/javascript">   
-$(document).ready(function() {
-     $('#DivisionRestbl').DataTable( {
-         orderCellsTop: true,
-         fixedHeader: true,
-         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        //  dom: 'lBfrtip',
-         "scrollX": true,
-         "scrollY":500,
-         buttons: [
-           'colvis'
-       ]
-     } );
- } );
- </script>
+<?php include 'user_filter_access_script.php'; ?>
 <!-- select 2 -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
 <!-- datatables column visibility -->
@@ -545,7 +539,6 @@ $(document).ready(function() {
 <script src="../assets/js/config/tour.minfd53.js?v4.0.1"></script>
 
 <!-- Page -->
-
 <script src="../assets/js/Site.minfd53.js?v4.0.1"></script>
 <script src="../global/js/Plugin/asscrollable.minfd53.js?v4.0.1"></script>
 <script src="../global/js/Plugin/slidepanel.minfd53.js?v4.0.1"></script>
@@ -555,7 +548,6 @@ $(document).ready(function() {
 <script src="../global/js/Plugin/jvectormap.minfd53.js?v4.0.1"></script>
 <script src="../global/js/Plugin/peity.minfd53.js?v4.0.1"></script>
 <script src="../assets/examples/js/dashboard/v1.minfd53.js?v4.0.1"></script>
-
 
 <script src="../global/vendor/bootstrap-datepicker/bootstrap-datepicker.minfd53.js?v4.0.1"></script>
 <script src="../global/vendor/timepicker/jquery.timepicker.minfd53.js?v4.0.1"></script>
