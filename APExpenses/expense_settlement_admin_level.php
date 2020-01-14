@@ -5,69 +5,25 @@ $_SESSION['status'];  //Status = 0
 $_SESSION['Dcode'];    // Dcode -- Designation Code
 $_SESSION['Name'];    // Name of employee
 $_SESSION['finRights'];  // finRights  = 0 or 1
-if($_SESSION['Dcode'] == 'ZM'){
-    $divsion =sqlsrv_query($conn,"SELECT DISTINCT ZONEID,ZONENAME  FROM RASI_ZONETABLE WHERE DBMID='".$_SESSION['EmpID']."'");
-}elseif($_SESSION['Dcode'] == 'RBM'){
-    $sql ="SELECT REGIONID FROM  RASI_REGIONTABLE WHERE RBMID='".$_SESSION['EmpID']."'";
-    $res = sqlsrv_query($conn,$sql);
-    $row_count = sqlsrv_fetch_array($res);
-    $req_id = $row_count['REGIONID'];
-
-    $sqls ="SELECT TOP 1 ZONEID FROM RASI_TRZMAPPINGTABLE WHERE REGIONID='".$req_id."'";
-    $ress = sqlsrv_query($conn,$sqls);
-    $row_counts = sqlsrv_fetch_array($ress);
-    $zone_ids = $row_counts['ZONEID'];
-    
-    $zone_det ="SELECT TOP 1 ZONENAME FROM RASI_ZONETABLE WHERE ZONEID='".$zone_ids."'";
-    $zoneqer = sqlsrv_query($conn,$zone_det);
-    $zone_counts = sqlsrv_fetch_array($zoneqer);
-    $zone_name = $zone_counts['ZONENAME'];
-}elseif($_SESSION['Dcode'] == 'TM'){
-    $tztable =sqlsrv_query($conn,"SELECT TOP 1 TMID FROM RASI_TMTABLE WHERE EMPLID='".$_SESSION['EmpID']."'");
-    $row_tm = sqlsrv_fetch_array($tztable);
-    $TMID_id = $row_tm['TMID'];
-
-    $ress = sqlsrv_query($conn,"SELECT TOP 1 REGIONID,ZONEID FROM RASI_TRZMAPPINGTABLE WHERE TMID='".$TMID_id."'");
-    $row_counts = sqlsrv_fetch_array($ress);
-    $zone_ids   = $row_counts['ZONEID'];
-    $region_ids = $row_counts['REGIONID'];
-    
-    $sql ="SELECT TOP 1 REGIONNAME FROM  RASI_REGIONTABLE WHERE REGIONID='".$region_ids."'";
-    $res = sqlsrv_query($conn,$sql);
-    $row_count = sqlsrv_fetch_array($res);
-    $regions_names = $row_count['REGIONNAME']; 
-    
-    $zone_det ="SELECT TOP 1 ZONENAME FROM RASI_ZONETABLE WHERE ZONEID='".$zone_ids."'";
-    $zoneqer = sqlsrv_query($conn,$zone_det);
-    $zone_counts = sqlsrv_fetch_array($zoneqer);
-    $zone_name = $zone_counts['ZONENAME'];
-}
-
 include("phpmailer/class.phpmailer.php");
 $max_is =sqlsrv_query($conn,"SELECT COALESCE(MAX(SId),0)+1 As res_id FROM ANP_Settlements");  
 $req_det = sqlsrv_fetch_array($max_is);
 $req_id = $req_det['res_id'];
 
 if(isset($_REQUEST['submit'])){
-  $createdons      = date("dmYHisA");
+  $createdons=date("dmYHisA");
   $request_date    = date("Y-m-d", strtotime($_REQUEST['request_date'])); 
   $activity_id     = $_REQUEST['activity_id']; 
   $sub_activity_id = $_REQUEST['sub_activity_id']; 
-  $division_id     = $_REQUEST['division_id']; 
-  $region_id       = $_REQUEST['region_id']; 
-  $teritory_id     = $_REQUEST['teritory_id']; 
-  $division_name   = $_REQUEST['div_name']; 
-  $region_name     = $_REQUEST['reg_name'];  
-  $teritory_name   = $_REQUEST['teri_name'];
-  $common_remark   = $_REQUEST['common_remark']; 
-  $created_by      = $_SESSION['EmpID'];
-  $created_at      = date('Y-m-d H:i:s');
+  $common_remark    = $_REQUEST['common_remark']; 
+  $created_by       = $_SESSION['EmpID'];
+  $created_at       = date('Y-m-d H:i:s');
   $max_isd =sqlsrv_query($conn,"SELECT COALESCE(MAX(SId),0)+1 As res_id FROM ANP_Settlements");  
   $req_detd = sqlsrv_fetch_array($max_isd);
   $req_idd = $req_detd['res_id'];
   $request_id      = "ANP/CLM/2019-2020/".''.$req_idd;
   
-  $tbl_settlements = sqlsrv_query($conn,"INSERT INTO ANP_Settlements(SCode,SettlementDate,ActivityId,SubActivityId,DivisionId,RegionId,TeritoryId,DivisionName,RegionName,TeritoryName,AdvSettlementCommonRemark,CreatedBy,CreatedAt )VALUES('$request_id','$request_date','$activity_id','$sub_activity_id','$division_id','$region_id','$teritory_id','$division_name','$region_name','$teritory_name','$common_remark','$created_by','$created_at')");
+  $tbl_settlements = sqlsrv_query($conn,"INSERT INTO ANP_Settlements(SCode,SettlementDate,ActivityId,SubActivityId,AdvSettlementCommonRemark,CreatedBy,CreatedAt )VALUES('$request_id','$request_date','$activity_id','$sub_activity_id','$common_remark','$created_by','$created_at')");
   if($tbl_settlements){
       $max_ids  = sqlsrv_query($conn,"SELECT SId As max_id FROM ANP_Settlements WHERE SCode = '$request_id'");  
       $req_dets = sqlsrv_fetch_array($max_ids);
@@ -463,8 +419,6 @@ h3.panel-title {
       <div class="panel panel-bordered">
           <div class="panel-body ReportTablediv expensesDiv" id="ReportTablediv">
             <form class="form-horizontal form-label-left adv_submit" name="form_name"  role="form" method="POST" enctype="multipart/form-data" >
-            <input type="hidden" class="login_type" value="<?php echo $_SESSION['Dcode']?>" readonly>
-
             <div class="form-group row">
               <div class="col-md-4 col-sm-12 col-xs-12">
                 <div class="row">
@@ -483,60 +437,6 @@ h3.panel-title {
                 </div>
                 </div>
               </div>
-              <h3 class="col-xs-12">Advance Receiver Details</h3>
-        <div class="form-group row">
-          <div class="col-md-4 col-sm-12 col-xs-12">
-            <div class="row">
-              <label class="control-label col-md-3 col-sm-4 col-xs-12" for="name">Divison<span class="required">*</span> </label>
-                <div class="col-md-9 col-sm-8 col-xs-12 ">
-                <select class="js-example-basic-single col-xs-12 required_for_valid cls_division div_select" name="division_id" onchange="get_region(this.value);document.getElementById('div_name').value=this.options[this.selectedIndex].text" >
-                  <option value="">  Select Divison  </option>
-                  <?php
-                    if($_SESSION['Dcode'] == 'ZM'){
-                      $divsion =sqlsrv_query($conn,"SELECT DISTINCT ZONEID,ZONENAME  FROM RASI_ZONETABLE WHERE DBMID='".$_SESSION['EmpID']."'");
-                    }else{
-                      $divsion =sqlsrv_query($conn,"SELECT DISTINCT $TRZMapping.ZONEID,$zmtbl.ZONENAME  FROM $TRZMapping LEFT JOIN $zmtbl on $TRZMapping.ZONEID=$zmtbl.ZoneID");
-                    }
-                    while($row = sqlsrv_fetch_array($divsion)){
-                  ?>
-                  <option value="<?php echo $row['ZONEID']; ?>" <?php if(isset($zone_ids) && $zone_ids == $row['ZONEID']){ echo 'Selected'; }?>> <?php echo $row['ZONENAME']; ?> </option>
-                <?php } ?>
-                </select>
-                <!--  <input type="hidden" name="div_name" id="div_name7" value="" /> -->
-                <input type="hidden" name="division_id" class="div_text" value="<?php echo isset($zone_ids) ? $zone_ids : ""; ?>" disabled/>
-                <input type="hidden" name="div_name"  class=""  id="div_name" value="<?php echo isset($zone_name) ? $zone_name : "" ; ?>"/>
-                </div>
-            </div>
-            </div>
-            <div class=" col-md-4 col-sm-12 col-xs-12">
-            <div class="row">
-              <label class="control-label col-md-3 col-sm-4 col-xs-12" for="name">Region<span class="required">*</span></label>
-                <div class="col-md-9 col-sm-8 col-xs-12 ">
-                <select class="js-example-basic-single col-xs-12 required_for_valid cls_region reg_select" name="region_id" onchange="get_teritory(this.value);document.getElementById('reg_name').value=this.options[this.selectedIndex].text" >
-                <option value="">Select </option>
-                </select>
-                <!-- <input type="hidden" name="reg_name" id="reg_name" value="" /> -->
-                <input type="hidden" name="region_id" class="reg_text" value="<?php echo isset($region_ids) ? $region_ids : ""; ?>" disabled/>
-                <input type="hidden" name="reg_name"  id="reg_name" value="<?php echo isset($regions_names) ? $regions_names : "" ; ?>"/>
-                </div>
-            </div>
-            </div>
-          </div>
-        <div class="form-group row">
-          <div class="col-md-4 col-sm-12 col-xs-12">
-            <div class="row">
-              <label class="control-label col-md-3 col-sm-4 col-xs-12" for="name">Territory<span class="required">*</span> </label>
-                <div class="col-md-9 col-sm-8 col-xs-12 ">
-                <select class="js-example-basic-single col-xs-12 required_for_valid cls_teritory" name="teritory_id" 
-                onchange="document.getElementById('teri_name').value=this.options[this.selectedIndex].text">
-                <option value="">Select </option>
-                </select>
-                <input type="hidden" name="teri_name" id="teri_name" value="" />
-                </div>
-            </div>
-            </div>
-          </div>
-
             <div class="form-group row">
               <div class="col-md-4 col-sm-12 col-xs-12">
                 <div class="row">
@@ -805,99 +705,6 @@ h3.panel-title {
       return false;
     } 
   });
-/* User Acccess */
-
-$(document).ready(function(){
-    division_dets();
-    region_dets(); 
-  });
-/* Region level login disable for Division */
-function division_dets(){
-var val        = $(".cls_division").val();
-var login_type = $(".login_type").val();
-var id         = $(".reg_text").val();
-
- $.ajax 
-  ({
-    type: "POST",
-    url: "ajax.php",
-    data:'division_id='+val+'&&action_type=GET_REG',			 
-    success: function(data){
-        $('.cls_region').html(data);
-        $('.cls_region').val(id);
-
-        $(".div_select").removeAttr("disabled", "disabled");
-        $(".div_text").removeAttr("disabled", "disabled");
-        if(login_type == "RBM"){
-          $(".div_select").attr("disabled", "disabled");
-          $(".div_text").removeAttr("disabled", "disabled");
-        }else{
-          $(".div_text").attr("disabled", "disabled");
-          $(".div_select").removeAttr("disabled", "disabled");
-        }
-      }
-  });
-}
-
-/* Territory level login disable for region and Division */
-function region_dets(){
-    var val = $(".reg_text").val();
-    var login_type = $(".login_type").val();
-    // alert(login_type);
-    $.ajax 
-      ({
-        type: "POST",
-        url: "ajax.php",
-        data:'region_id='+val+'&&action_type=GET_TM',			 
-        success: function(data){
-                  $('.cls_teritory').html(data);
-                  $(".div_select").removeAttr("disabled", "disabled");
-                  $(".div_text").removeAttr("disabled", "disabled");
-                  $(".reg_select").removeAttr("disabled", "disabled");
-                  $(".reg_text").removeAttr("disabled", "disabled");
-              if(login_type == "TM"){
-                $(".div_select").attr("disabled", "disabled");
-                  $(".div_text").removeAttr("disabled", "disabled");
-                  $(".reg_select").attr("disabled", "disabled");
-                  $(".reg_text").removeAttr("disabled", "disabled");
-              }else{
-                  $(".div_select").removeAttr("disabled", "disabled");
-                  $(".div_text").attr("disabled", "disabled");
-                  $(".reg_select").removeAttr("disabled", "disabled");
-                  $(".reg_text").attr("disabled", "disabled");
-              }
-          }
-      });
-}
-
-function get_region(val) {  
-  var action_type = 'GET_REG';
-  $.ajax 
-    ({
-      type: "POST",
-      url: "ajax.php",
-      data:'division_id='+val+'&&action_type='+action_type,			 
-      success: function(data){
-          $('.cls_region').html(data);
-        }
-    });
-	}
-
-  function get_teritory(val) {  
-    var action_type = 'GET_TM';
-    $.ajax 
-      ({
-        type: "POST",
-        url: "ajax.php",
-        data:'region_id='+val+'&&action_type='+action_type,			 
-        success: function(data){
-           $('.cls_teritory').html(data);
-          }
-      });
-	}
-
-/* End User Acccess */
-
   $(document).on('keyup','.cls_amt1,.cls_amt2', function(){
     var _this = this;
     var cls_amt1 =  $(this).closest("tr").find(".cls_amt1").val();
