@@ -7,11 +7,6 @@
   $_SESSION['finRights'];  // finRights  = 0 or 1 
 
 if($_SESSION['Dcode'] == 'ZM'){
-/*   $sql ="SELECT ZONEID FROM  RASI_ZONETABLE WHERE DBMID='".$_SESSION['EmpID']."'";
-  $res = sqlsrv_query($conn,$sql);
-  $row_count = sqlsrv_fetch_array($res);
-  echo "TEST";
-  echo $ZONEID = $row_count['ZONEID']; */
 
   $divsion =sqlsrv_query($conn,"SELECT DISTINCT ZONEID,ZONENAME  FROM RASI_ZONETABLE WHERE DBMID='".$_SESSION['EmpID']."'");
 
@@ -60,6 +55,7 @@ if($_SESSION['Dcode'] == 'ZM'){
              
   if(isset($_REQUEST['submit'])){
     $created_by      = $_SESSION['EmpID'];
+    $created_name    = $_SESSION['Name'];
     $created_at      = date('Y-m-d H:i:s');
     $request_id      = $_REQUEST['request_id'];
     $request_date    = date("Y-m-d", strtotime($_REQUEST['request_date']));
@@ -81,67 +77,105 @@ if($_SESSION['Dcode'] == 'ZM'){
     $activity_id     = $_REQUEST['activity_id']; 
     $sub_activity_id = $_REQUEST['sub_activity_id']; 
     $avt_amt         = $_REQUEST['avt_amt']; 
-    $max_isd =sqlsrv_query($conn,"SELECT COALESCE(MAX(AdvId),0)+1 As res_id FROM $advreques");  
-    $req_detd = sqlsrv_fetch_array($max_isd);
-    $req_idd = $req_detd['res_id'];
-    $request_id      = "ANP/ADV/2019-2020/".''.$req_idd;
+    $max_isd    = sqlsrv_query($conn,"SELECT COALESCE(MAX(AdvId),0)+1 As res_id FROM $advreques");  
+    $req_detd   = sqlsrv_fetch_array($max_isd);
+    $req_idd    = $req_detd['res_id'];
+    $request_id = "ANP/ADV/2019-2020/".''.$req_idd;
     $insert = sqlsrv_query($conn,"INSERT INTO ANP_Advance(ReqIdPre,ReqId,ReqDate,ReqDivisionId,ReqDivisionName,ReqRegionId,ReqRegionName,ReqTeritoryId,ReqTeritoryName,AdvanceTo,AdvRequestCommonRemark,CreatedBy,CreatedAt ) VALUES ('$request_id','$request_id','$request_date','$division_id','$division_name','$region_id','$region_name','$teritory_id','$teritory_name','$emp_id','$common_remark','$created_by','$created_at')");
     if($insert){
       $max_ids  = sqlsrv_query($conn,"SELECT AdvId As max_id FROM ANP_Advance WHERE ReqId = '$request_id'");  
       $req_dets = sqlsrv_fetch_array($max_ids);
-      $adv_ids = $req_dets['max_id'];
+      $adv_ids  = $req_dets['max_id'];
     
       for($i=0,$j=0;$i<sizeof($crop_id);$i++,$j++){
            $inserta = sqlsrv_query($conn,"INSERT INTO ANP_Advance_Amount(AdvId,CropId,ActivityId,SubActivityId,AdvAmount,CreatedBy,CreatedAt) VALUES ('$adv_ids','$crop_id[$i]','$activity_id[$i]','$sub_activity_id[$i]','$avt_amt[$i]','$created_by','$created_at')"); 
         $tot_amt = $tot_amt + $avt_amt[$i];
         }
       if(sizeof($crop_id) == $j){
-        
+        $Emp_det =sqlsrv_query($conn,"SELECT APDESIGN FROM  EMPLTABLE WHERE EMPLID='".$emp_id."'");
+        $emp_fetch = sqlsrv_fetch_array($Emp_det);
+        $emp_designation = $emp_fetch['APDESIGN'];
+        if($emp_designation == 'DBM'){      
+          $etztable  = sqlsrv_query($conn,"SELECT TOP 1 ZONEID,EMAIL FROM RASI_ZONETABLE WHERE DBMID='".$emp_id."'");
+          $erow_tm   = sqlsrv_fetch_array($etztable);
+          $eTMID_id  = $erow_tm['ZONEID'];
+          $cc_mail   = $erow_tm['EMAIL'];
+          
+          $zone =sqlsrv_query($conn,"SELECT EMAIL FROM RASI_ZONETABLE WHERE ZONEID='".$eTMID_id."' AND EMAIL != ''");
+          While($row_zone = sqlsrv_fetch_array($zone)){
+            $to_mail[] = $row_zone['EMAIL']; 
+          }
+
+        }elseif($emp_designation == 'RBM'){
+          $etztable  = sqlsrv_query($conn,"SELECT REGIONID,EMAIL FROM RASI_REGIONTABLE WHERE RBMID='".$emp_id."'");
+          $erow_tm   = sqlsrv_fetch_array($etztable);
+          $eRGID_id  = $erow_tm['REGIONID'];
+          $cc_mail   = $erow_tm['EMAIL'];
+
+          $eress=sqlsrv_query($conn,"SELECT TOP 1 ZONEID FROM RASI_TRZMAPPINGTABLE WHERE REGIONID='".$eRGID_id."'");
+          $erow_counts = sqlsrv_fetch_array($eress);
+          $ezone_ids = $erow_counts['ZONEID'];
+          
+          $zone =sqlsrv_query($conn,"SELECT EMAIL FROM RASI_ZONETABLE WHERE ZONEID='".$ezone_ids."' AND EMAIL != ''");
+          While($row_zone = sqlsrv_fetch_array($zone)){
+            $to_mail[] = $row_zone['EMAIL']; 
+          }
+        }elseif($emp_designation == 'TM'){
+          $etztable  = sqlsrv_query($conn,"SELECT TMID,EMAIL FROM RASI_TMTABLE WHERE EMPLID='".$emp_id."'");
+          $erow_tm   = sqlsrv_fetch_array($etztable);
+          $eTMID_id  = $erow_tm['TMID'];
+          $cc_mail   = $erow_tm['EMAIL'];
+
+          $eress=sqlsrv_query($conn,"SELECT TOP 1 REGIONID FROM RASI_TRZMAPPINGTABLE WHERE TMID='".$eTMID_id."'");
+          $erow_counts = sqlsrv_fetch_array($eress);
+          $eregion_ids = $erow_counts['REGIONID'];
+          
+          $regon =sqlsrv_query($conn,"SELECT EMAIL FROM RASI_REGIONTABLE WHERE REGIONID='".$eregion_ids."' AND EMAIL != ''");
+          While($row_regon = sqlsrv_fetch_array($regon)){
+            $to_mail[] = $row_regon['EMAIL']; 
+          }
+        }
         /*  */
-            $subject  ="INR ".$tot_amt." Advance Request From $created_by";
-            $message 	="<div>
-                          <table border='0'>
-                              <tr><td>Requested By  </td><td> : </td><td> $created_by</td></tr>
-                              <tr><td>Requested For </td><td> : </td><td> $emp_id</td></tr>
-                              <tr><td>Division      </td><td> : </td><td> $division_name</td></tr>
-                              <tr><td>Region        </td><td> : </td><td> $region_name</td></tr>
-                              <tr> <td>Territory    </td><td> : </td><td> $teritory_name</td></tr>
-                          </table>
-                        </div></br>
-                        <table border='1' >
-                        <tr>
-                          <th style='padding:5px;'>S.No.</th>
-                          <th style='padding:5px;'>Crop</th>
-                          <th style='padding:5px;'>Activity</th>
-                          <th style='padding:5px;'>Sub Activity</th>
-                          <th align='right' style='padding:5px;'>Req. Amt.</th>
-                        </tr>";
-                      for($i=0,$j=1;$i<sizeof($crop_id);$i++,$j++){
-                          $viw_adv =sqlsrv_query($conn,"SELECT DISTINCT ACTIVITYTYPE,SUBACTIVITY FROM APSUBACTIVITYMASTER WHERE APSUBACTIVITYMASTER.ID='$sub_activity_id[$i]'");  
-                          $rows             = sqlsrv_fetch_array($viw_adv);
-                          $activity_ids     = $rows['ACTIVITYTYPE'];
-                          $subactivity_ids  = $rows['SUBACTIVITY'];
-                    $message.= " <tr>
-                                    <td style='padding:5px;'>$j</td>
-                                    <td style='padding:5px;'>$crop_id[$i]</td>
-                                    <td style='padding:5px;'>$activity_ids</td>
-                                    <td style='padding:5px;'>$subactivity_ids</td>
-                                    <td align='right' style='padding:5px;'>$avt_amt[$i]</td>
-                                  </tr>";
-                      }
-                      $message.= "<tr>
-                                      <td colspan='4' style='padding:5px;'> <b>Total </b></td>
-                                      <td align='right' style='padding:5px;'><b>$tot_amt </b></td>
-                                    </tr></table>";
-                          
-  
-  
-  
-                          
+        $subject  ="INR ".$tot_amt." Advance Request From $created_name";
+        $message 	="<div>
+              <table border='0'>
+                  <tr><td>Requested By  </td><td> : </td><td> $created_name</td></tr>
+                  <tr><td>Requested For </td><td> : </td><td> $emp_id</td></tr>
+                  <tr><td>Division      </td><td> : </td><td> $division_name</td></tr>
+                  <tr><td>Region        </td><td> : </td><td> $region_name</td></tr>
+                  <tr> <td>Territory    </td><td> : </td><td> $teritory_name</td></tr>
+              </table>
+            </div></br>
+            <table border='1' >
+            <tr>
+              <th style='padding:5px;'>S.No.</th>
+              <th style='padding:5px;'>Crop</th>
+              <th style='padding:5px;'>Activity</th>
+              <th style='padding:5px;'>Sub Activity</th>
+              <th align='right' style='padding:5px;'>Req. Amt.</th>
+            </tr>";
+          for($i=0,$j=1;$i<sizeof($crop_id);$i++,$j++){
+              $viw_adv =sqlsrv_query($conn,"SELECT DISTINCT ACTIVITYTYPE,SUBACTIVITY FROM APSUBACTIVITYMASTER WHERE APSUBACTIVITYMASTER.ID='$sub_activity_id[$i]'");  
+              $rows             = sqlsrv_fetch_array($viw_adv);
+              $activity_ids     = $rows['ACTIVITYTYPE'];
+              $subactivity_ids  = $rows['SUBACTIVITY'];
+        $message.= " <tr>
+                        <td style='padding:5px;'>$j</td>
+                        <td style='padding:5px;'>$crop_id[$i]</td>
+                        <td style='padding:5px;'>$activity_ids</td>
+                        <td style='padding:5px;'>$subactivity_ids</td>
+                        <td align='right' style='padding:5px;'>$avt_amt[$i]</td>
+                      </tr>";
+          }
+          $message.= "<tr>
+                          <td colspan='4' style='padding:5px;'> <b>Total </b></td>
+                          <td align='right' style='padding:5px;'><b>$tot_amt </b></td>
+                        </tr></table>";
+              
             $message.= "</br><a href='$url/request_adv_approval.php?Advid=$adv_ids'> Click Here To Approve </a>";          
             $name 	= "prasanth.p@mazenetsolution.com";
             $pass		=	"prasanth@12";
-            $to		  =	"prasanth.p@mazenetsolution.com";
+            // $to		  =	"prasanth.p@mazenetsolution.com";
                               
             $mail = new PHPMailer();
             $mail->CharSet =  "utf-8";
@@ -153,19 +187,18 @@ if($_SESSION['Dcode'] == 'ZM'){
             $mail->Host = 	    "smtp.gmail.com";// Host FROM DATABASE
             $mail->Port = 		"465";// Port FROM DATABASE
             $mail->setFrom($name);
-            $mail->AddAddress($to);
-            // $mail->addCC('prasanth.p@mazenetsolution.com');
-            // $mail->addBCC('prasanth.p@mazenetsolution.com');
+            foreach($to_mail as $key => $val){   // To Mail ids
+              $mail->AddAddress($val); 
+            }
+            // $mail->AddAddress($to);
+            $mail->addCC($cc_mail);
             $mail->Subject  = $subject;
             $mail->IsHTML(true);
             $mail->Body    = $message;
-  
+            
             if($mail->Send())
             {
-              /* echo "<script type='text/javascript'>alert('Thank You </br> Your Request ID Is $request_id </br> Advance Request is send for Approval')</script>";
-              echo '<script type="text/javascript">window.location.replace("view_advance_request.php");</script>'; */
               echo "<script>window.location='advance_request.php?request_id=".$request_id."'</script>";
-  
             }else {      
               echo '<script type="text/javascript">
                 window.location.replace("view_advance_request.php?sts=fail");
@@ -609,7 +642,7 @@ h3.panel-title {
           </table>
           </div>
           <div class="row mb-3">
-              <label class="control-label col-md-1 text-center" for="name">Remark <span class="required">*</span></label>
+              <label class="control-label col-md-1 text-center" for="name">Remark </label>
                 <div class="col-md-9">
                 <textarea name="common_remark" class="form-control" rows="2"></textarea>
               </div>          
@@ -660,15 +693,26 @@ h3.panel-title {
     });
   }
   $(document).ready(function(){
-    division_dets();
-    region_dets(); 
+    var login_type = $(".login_type").val();
+// alert(login_type);
+
+      if(login_type =='RBM'){
+          region_dets();
+          division_dets(); 
+      }else if(login_type =='TM'){
+        division_dets();
+        region_dets();
+      }else{
+        division_dets();
+        region_dets();
+      }
   });
 /* Region level login disable for Division */
 function division_dets(){
 var val        = $(".cls_division").val();
 var login_type = $(".login_type").val();
 var id         = $(".reg_text").val();
-
+// alert(login_type);
  $.ajax 
   ({
     type: "POST",
@@ -681,6 +725,7 @@ var id         = $(".reg_text").val();
         $(".div_select").removeAttr("disabled", "disabled");
         $(".div_text").removeAttr("disabled", "disabled");
         if(login_type == "RBM"){
+          // alert('RBM-IN');
           $(".div_select").attr("disabled", "disabled");
           $(".div_text").removeAttr("disabled", "disabled");
         }else{

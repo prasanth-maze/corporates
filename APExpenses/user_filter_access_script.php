@@ -1,9 +1,18 @@
 <script type="text/javascript">   
 /* Region level login disable for Division */
 $(document).ready(function(){
-  division_dets();
-  region_dets(); 
-});
+    var login_type = $(".login_type").val();
+      if(login_type =='RBM'){
+          region_dets();
+          division_dets(); 
+      }else if(login_type =='TM'){
+        division_dets();
+        region_dets();
+      }else{
+        division_dets();
+        region_dets();
+      }
+  });
 
 function division_dets(){
   var val        = $(".cls_division").val();

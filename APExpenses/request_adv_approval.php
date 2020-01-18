@@ -1,8 +1,8 @@
 <?php 
-  include 'header.php';
-  include("phpmailer/class.phpmailer.php");
-  $url = 'http://' . $_SERVER['HTTP_HOST'];
-  $url .= rtrim(dirname($_SERVER['PHP_SELF']), '/\\'); 
+include 'header.php';
+include("phpmailer/class.phpmailer.php");
+$url = 'http://' . $_SERVER['HTTP_HOST'];
+$url .= rtrim(dirname($_SERVER['PHP_SELF']), '/\\'); 
 if(isset($_REQUEST['Advid'])){  $adv_id = $_REQUEST['Advid']; }else{ $adv_id  =  0;  }
 if(isset($_REQUEST['submit'])){
   $approved_by     = $_SESSION['EmpID'];
@@ -37,7 +37,53 @@ if(isset($_REQUEST['submit'])){
         $inserta = sqlsrv_query($conn,"UPDATE ANP_Advance_Amount SET ApprovedAmount='$approve_amt[$i]',ApprovedRemark='$approve_remark[$i]',ApprovedBy='$approved_by',ApprovedAt='$approved_at' WHERE Id = '$adv_amt_id[$i]'" ); 
    }
   if(sizeof($adv_amt_id) == $j){
-    $tot_appr_amt = array_sum($approve_amt); 
+      $tot_appr_amt = array_sum($approve_amt); 
+      // $to_mail[]      = $_REQUEST['tomail'];
+      $emp_id       = $_SESSION['EmpID'];
+      $Emp_det      = sqlsrv_query($conn,"SELECT APDESIGN FROM  EMPLTABLE WHERE EMPLID='".$emp_id."'");
+      $emp_fetch    = sqlsrv_fetch_array($Emp_det);
+      $emp_designation = $emp_fetch['APDESIGN'];
+      if($emp_designation == 'DBM'){      
+        $etztable  = sqlsrv_query($conn,"SELECT TOP 1 ZONEID,EMAIL FROM RASI_ZONETABLE WHERE DBMID='".$emp_id."'");
+        $erow_tm   = sqlsrv_fetch_array($etztable);
+        $eTMID_id  = $erow_tm['ZONEID'];
+        $cc_mail   = $erow_tm['EMAIL'];
+        
+        $zone =sqlsrv_query($conn,"SELECT EMAIL FROM RASI_ZONETABLE WHERE ZONEID='".$eTMID_id."' AND EMAIL != ''");
+        While($row_zone = sqlsrv_fetch_array($zone)){
+          $to_mail[] = $row_zone['EMAIL']; 
+        }
+
+      }elseif($emp_designation == 'RBM'){
+        $etztable  = sqlsrv_query($conn,"SELECT REGIONID,EMAIL FROM RASI_REGIONTABLE WHERE RBMID='".$emp_id."'");
+        $erow_tm   = sqlsrv_fetch_array($etztable);
+        $eRGID_id  = $erow_tm['REGIONID'];
+        $cc_mail   = $erow_tm['EMAIL'];
+
+        $eress=sqlsrv_query($conn,"SELECT TOP 1 ZONEID FROM RASI_TRZMAPPINGTABLE WHERE REGIONID='".$eRGID_id."'");
+        $erow_counts = sqlsrv_fetch_array($eress);
+        $ezone_ids = $erow_counts['ZONEID'];
+        
+        $zone =sqlsrv_query($conn,"SELECT EMAIL FROM RASI_ZONETABLE WHERE ZONEID='".$ezone_ids."' AND EMAIL != ''");
+        While($row_zone = sqlsrv_fetch_array($zone)){
+          $to_mail[] = $row_zone['EMAIL']; 
+        }
+      }elseif($emp_designation == 'TM'){
+        $etztable  = sqlsrv_query($conn,"SELECT TMID,EMAIL FROM RASI_TMTABLE WHERE EMPLID='".$emp_id."'");
+        $erow_tm   = sqlsrv_fetch_array($etztable);
+        $eTMID_id  = $erow_tm['TMID'];
+        $cc_mail   = $erow_tm['EMAIL'];
+
+        $eress=sqlsrv_query($conn,"SELECT TOP 1 REGIONID FROM RASI_TRZMAPPINGTABLE WHERE TMID='".$eTMID_id."'");
+        $erow_counts = sqlsrv_fetch_array($eress);
+        $eregion_ids = $erow_counts['REGIONID'];
+        
+        $regon =sqlsrv_query($conn,"SELECT EMAIL FROM RASI_REGIONTABLE WHERE REGIONID='".$eregion_ids."' AND EMAIL != ''");
+        While($row_regon = sqlsrv_fetch_array($regon)){
+          $to_mail[] = $row_regon['EMAIL']; 
+        }
+      }
+      /*  */
       $subject  ="INR ".$tot_appr_amt." Approved By $approved_by";
       $message 	="<div>
 					<table border='0'>
@@ -85,32 +131,25 @@ if(isset($_REQUEST['submit'])){
       $mail->Username = $name;
       $mail->Password = $pass;
       $mail->SMTPSecure = "ssl"; // SSL FROM DATABASE
-      $mail->Host = "smtp.gmail.com";// Host FROM DATABASE
-      $mail->Port = "465";// Port FROM DATABASE
+      $mail->Host = 	    "smtp.gmail.com";// Host FROM DATABASE
+      $mail->Port = 		"465";// Port FROM DATABASE
       $mail->setFrom($name);
-      $mail->AddAddress($to);
-      $mail->addCC('prasanth.p@mazenetsolution.com');
-      $mail->addBCC('prasanth.p@mazenetsolution.com');
+      foreach($to_mail as $key => $val){   // To Mail ids
+        $mail->AddAddress($val); 
+      }
+      // $mail->AddAddress($to);
+      $mail->addCC($cc_mail);
       $mail->Subject  = $subject;
       $mail->IsHTML(true);
       $mail->Body    = $message;
-      if($mail->Send())
-      {
-/*         echo "<script type='text/javascript'>alert('Approved SuccessFully.')</script>";
-        echo '<script type="text/javascript">
-                window.location.replace("advance_payment_approval_view.php");
-            </script>'; */
-            echo "<script>window.location='request_adv_approval.php?request_id=".$request_id."'</script>";
-
-      }else{
-        echo '<script type="text/javascript">
-          window.location.replace("advance_payment_approval_view.php?sts=fail");
-          </script>'; 
-      }
+      
+          if($mail->Send()) {
+              echo "<script>window.location='request_adv_approval.php?request_id=".$request_id."'</script>";
+          }else{
+            echo '<script type="text/javascript">window.location.replace("advance_payment_approval_view.php?sts=fail");</script>'; 
+          }
         }else {      
-        echo '<script type="text/javascript">
-          window.location.replace("advance_payment_approval_view.php?sts=fail");
-          </script>';
+            echo '<script type="text/javascript"> window.location.replace("advance_payment_approval_view.php?sts=fail");</script>';
       } 
     }
 ?>
@@ -415,23 +454,27 @@ h3.panel-title {
   $emp_tbl        = sqlsrv_query($conn,"SELECT TOP 1 APDESIGN FROM EMPLTABLE WHERE EMPLID='$adv_tos'");  
   $fetch_emp_tbl  = sqlsrv_fetch_array($emp_tbl);
   if($fetch_emp_tbl['APDESIGN'] == 'DBM'){
-    $role_tbl        = sqlsrv_query($conn,"SELECT TOP 1 DBMNAME As EmpName FROM RASI_ZONETABLE WHERE DBMID='$adv_tos'");  
+    $role_tbl        = sqlsrv_query($conn,"SELECT TOP 1 DBMNAME As EmpName,EMAIL FROM RASI_ZONETABLE WHERE DBMID='$adv_tos'");  
     $fetch_role_tbl  = sqlsrv_fetch_array($role_tbl);
     $Empnames        = $fetch_role_tbl['EmpName'];
+    $tomail        = $fetch_role_tbl['EMAIL'];
   }if($fetch_emp_tbl['APDESIGN'] == 'RBM'){
-    $role_tbl        = sqlsrv_query($conn,"SELECT TOP 1 EMPLNAME As EmpName FROM RASI_REGIONTABLE WHERE RBMID='$adv_tos'");  
+    $role_tbl        = sqlsrv_query($conn,"SELECT TOP 1 EMPLNAME As EmpName,EMAIL FROM RASI_REGIONTABLE WHERE RBMID='$adv_tos'");  
     $fetch_role_tbl  = sqlsrv_fetch_array($role_tbl);
     $Empnames        = $fetch_role_tbl['EmpName'];
+    $tomail        = $fetch_role_tbl['EMAIL'];
   }if($fetch_emp_tbl['APDESIGN'] == 'TM'){
-    $role_tbl        = sqlsrv_query($conn,"SELECT TOP 1 EMPLNAME As EmpName FROM RASI_TMTABLE WHERE EMPLID='$adv_tos'");  
+    $role_tbl        = sqlsrv_query($conn,"SELECT TOP 1 EMPLNAME As EmpName,EMAIL FROM RASI_TMTABLE WHERE EMPLID='$adv_tos'");  
     $fetch_role_tbl  = sqlsrv_fetch_array($role_tbl);
     $Empnames        = $fetch_role_tbl['EmpName'];
+    $tomail        = $fetch_role_tbl['EMAIL'];
   }
 ?>
                 
                   <label class="control-label col-md-3 col-sm-4 col-xs-12" for="name">Request ID</label>
                     <div class="col-md-9 col-sm-8 col-xs-12 ">
                       <input type="text" class="form-control col-md-12 col-xs-12 required_for_valid" name="request_id"  value="<?php echo $fetch_adv_det['ReqId']; ?>" readonly>
+                      <input type="hidden"  name="tomail"  value="<?php echo $tomail; ?>" readonly>
                     </div>
                 </div>
                 </div>
@@ -533,7 +576,7 @@ h3.panel-title {
               </div>
 
               <div class="row mb-3">
-              <label class="control-label col-md-1 text-center" for="name">Remark <span class="required">*</span></label>
+              <label class="control-label col-md-1 text-center" for="name">Remark </label>
                 <div class="col-md-9">
                 <textarea name="common_remark" class="form-control" rows="2"></textarea>
               </div>          

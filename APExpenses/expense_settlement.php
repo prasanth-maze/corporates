@@ -808,8 +808,17 @@ h3.panel-title {
 /* User Acccess */
 
 $(document).ready(function(){
-    division_dets();
-    region_dets(); 
+  var login_type = $(".login_type").val();
+      if(login_type =='RBM'){
+          region_dets();
+          division_dets(); 
+      }else if(login_type =='TM'){
+        division_dets();
+        region_dets();
+      }else{
+        division_dets();
+        region_dets();
+      }
   });
 /* Region level login disable for Division */
 function division_dets(){

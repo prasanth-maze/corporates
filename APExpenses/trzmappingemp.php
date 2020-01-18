@@ -5,7 +5,7 @@
   $_SESSION['Dcode'];    // Dcode -- Designation Code
   $_SESSION['Name']; 
   $_SESSION['finRights'];  // finRights  = 0 or 1 
-  
+  // This for query used in List of for all the pages
  if($_SESSION['Dcode'] == 'ZM'){
     $zmall ='';
     $ZM_all = array();
@@ -16,7 +16,7 @@
     
     while($ZMlevel=sqlsrv_fetch_array($divsion))
     {
-        $allbrn = $ZMlevel['TMID'];
+        $allbrn = $ZMlevel['ZONEID'];
         $ZM_all[] = $allbrn;
     }
     $dmall = "'" . implode ( "', '", $ZM_all ) . "'";
@@ -24,19 +24,19 @@
     $rgall ='';
     $RM_all = array();
     $sql ="SELECT REGIONID FROM  RASI_REGIONTABLE WHERE RBMID='".$_SESSION['EmpID']."'";
-    /* $res = sqlsrv_query($conn,$sql);
-    $row_count = sqlsrv_fetch_array($res);
+     $res = sqlsrv_query($conn,$sql);
+    /*$row_count = sqlsrv_fetch_array($res);
     $region_id = $row_count['REGIONID']; */
 
-    while($RMlevel=sqlsrv_fetch_array($sql))
+    while($RMlevel=sqlsrv_fetch_array($res))
     {
-        $allrm = $RMlevel['TMID'];
+        $allrm = $RMlevel['REGIONID'];
         $RM_all[] = $allrm;
     }
     $rgall = "'" . implode ( "', '", $RM_all ) . "'";
 
 
-    $sqls ="SELECT TOP 1 ZONEID FROM RASI_TRZMAPPINGTABLE WHERE REGIONID='".$region_id."'";
+    /* $sqls ="SELECT TOP 1 ZONEID FROM RASI_TRZMAPPINGTABLE WHERE REGIONID='".$region_id."'";
     $ress = sqlsrv_query($conn,$sqls);
     $row_counts = sqlsrv_fetch_array($ress);
     $zone_ids = $row_counts['ZONEID'];
@@ -44,7 +44,7 @@
     $zone_det ="SELECT TOP 1 ZONENAME FROM RASI_ZONETABLE WHERE ZONEID='".$zone_ids."'";
     $zoneqer = sqlsrv_query($conn,$zone_det);
     $zone_counts = sqlsrv_fetch_array($zoneqer);
-    $zone_name = $zone_counts['ZONENAME'];
+    $zone_name = $zone_counts['ZONENAME']; */
 }elseif($_SESSION['Dcode'] == 'TM'){
     $tmall ='';
     $TM_all = array();

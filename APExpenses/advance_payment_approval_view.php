@@ -498,7 +498,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                     
                     if($_SESSION['Dcode'] == 'ZM'){
                       $adv_det.=" AND ANP_Advance.ReqDivisionId IN ($dmall)";
-                    }elseif($_SESSION['Dcode'] == 'DBM'){
+                    }elseif($_SESSION['Dcode'] == 'RBM'){
                       $adv_det.=" AND ANP_Advance.ReqRegionId IN ($rgall)";
                     }elseif($_SESSION['Dcode'] == 'TM'){
                       $adv_det.=" AND ANP_Advance.ReqTeritoryId IN ($tmall)";
@@ -511,6 +511,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                     ANP_Advance.ReqRegionName,
                     ANP_Advance.ReqTeritoryName"; 
                   }
+                  // echo $adv_det;
                   $viw_adv =sqlsrv_query($conn,$adv_det);
                   while($rows = sqlsrv_fetch_array($viw_adv)){ 
                       if($rows['ApprovedAmt'] != null){

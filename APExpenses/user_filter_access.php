@@ -6,6 +6,8 @@ if($_SESSION['Dcode'] == 'ZM'){
     $sql ="SELECT REGIONID FROM  RASI_REGIONTABLE WHERE RBMID='".$_SESSION['EmpID']."'";
     $res = sqlsrv_query($conn,$sql);
     $row_count = sqlsrv_fetch_array($res);
+    $req_id = $row_count['REGIONID'];
+
     $sqls ="SELECT TOP 1 ZONEID FROM RASI_TRZMAPPINGTABLE WHERE REGIONID='".$req_id."'";
     $ress = sqlsrv_query($conn,$sqls);
     $row_counts = sqlsrv_fetch_array($ress);

@@ -421,7 +421,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                            <th>Division</th>
                            <th>Region</th>
                            <th>Teritory</th>
-                           <th>Request Amt.</th>
+                           <th>Req. Amt.</th>
                            <th>Approved Amt.</th>
                            <th>Paid Amt.</th>
                            <th>Balance</th>
