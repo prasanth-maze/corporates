@@ -512,6 +512,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                     ANP_Advance.ReqTeritoryName"; 
                   }
                   // echo $adv_det;
+                  // Echo $_SESSION['EmpID'];
                   $viw_adv =sqlsrv_query($conn,$adv_det);
                   while($rows = sqlsrv_fetch_array($viw_adv)){ 
                       if($rows['ApprovedAmt'] != null){

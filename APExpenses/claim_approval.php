@@ -423,8 +423,7 @@ h3.panel-title {
                     <td><?php echo $fetch_activity_det['BillNo'] ;?></td>
                     <td><?php echo $fetch_activity_det['VendorName'] ;?></td>
                     <td><?php echo $fetch_activity_det['GstNo'] ;?></td>
-                    <td><a href="<?php echo $fetch_activity_det['DocFilePath'];?>" target="_blank">View Bill</a></td>
-
+                    <td><?php if($fetch_activity_det['DocFilePath'] !='') { ?><a href="<?php echo $fetch_activity_det['DocFilePath'];?>" target="_blank">View Bill</a> <?php } ?></td>
                     <!--  <td class ="right"><?php $tot_base_amt = $tot_base_amt + $fetch_activity_det['BaseAmount']; echo $fetch_activity_det['BaseAmount'] ;?></td>
                     <td class ="right"><?php $tot_gst_amt = $tot_gst_amt + $fetch_activity_det['GstAmount']; echo $fetch_activity_det['GstAmount'] ;?></td> -->
                     <td class ="max_amount right"><?php $tot_settle_amt = $tot_settle_amt + $fetch_activity_det['SubmittedAmt']; echo $fetch_activity_det['SubmittedAmt'] ;?></td>

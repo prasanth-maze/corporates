@@ -2,6 +2,7 @@
   include 'header.php';
   include 'user_filter_access.php';
   include 'trzmappingemp.php';
+  $emp_id = $_SESSION['EmpID'];
 ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <!-- select 2 -->
@@ -459,7 +460,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                 LEFT JOIN RASI_POHQTABLE ON ANP_Advance.AdvanceTo=RASI_POHQTABLE.POHQCODE
                 LEFT JOIN APSUBACTIVITYMASTER ON ANP_Advance_Amount.SubActivityId=APSUBACTIVITYMASTER.ID
                 LEFT JOIN ANP_Advance_Payment on ANP_Advance_Amount.Id=ANP_Advance_Payment.AdvAmtId
-                WHERE ANP_Advance.CurrentStatus='1' AND ANP_Advance_Amount.CurrentStatus='1'";
+                WHERE ANP_Advance.CurrentStatus='1' AND ANP_Advance_Amount.CurrentStatus='1' AND ANP_Advance.AdvanceTo='$emp_id'";
                 
                 if($_SESSION['Dcode'] == 'ZM'){
                   $adv_det.=" AND ANP_Advance.ReqDivisionId IN ($dmall)";
@@ -510,7 +511,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                 LEFT JOIN RASI_POHQTABLE ON ANP_Advance.AdvanceTo=RASI_POHQTABLE.POHQCODE
                 LEFT JOIN APSUBACTIVITYMASTER ON ANP_Advance_Amount.SubActivityId=APSUBACTIVITYMASTER.ID
                 LEFT JOIN ANP_Advance_Payment on ANP_Advance_Amount.Id=ANP_Advance_Payment.AdvAmtId
-                WHERE ANP_Advance.CurrentStatus='1' AND ANP_Advance_Amount.CurrentStatus='1'";
+                WHERE ANP_Advance.CurrentStatus='1' AND ANP_Advance_Amount.CurrentStatus='1' AND ANP_Advance.AdvanceTo='$emp_id'";
                 if($_SESSION['Dcode'] == 'ZM'){
                   $adv_det.=" AND ANP_Advance.ReqDivisionId IN ($dmall)";
                 }elseif($_SESSION['Dcode'] == 'DBM'){
@@ -529,6 +530,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                 ANP_Advance_Amount.ID,ANP_Advance_Amount.CropId,APSUBACTIVITYMASTER.SUBACTIVITY,
                 ANP_Advance_Amount.AdvAmount,ANP_Advance_Amount.ApprovedAmount";
               }
+              // echo $adv_det;
               $viw_adv =sqlsrv_query($conn,$adv_det);
               while($rows = sqlsrv_fetch_array($viw_adv)){ 
                 $i++;

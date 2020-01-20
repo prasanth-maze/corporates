@@ -269,9 +269,6 @@ margin-right: -40px;"> --></a> </header>
     <div style="border-top:1px solid rgba(69, 74, 84, 0.7)"></div>
     <div class="menu">
       <ul id="menu" >
-        <li id="menu-home" class="<?=@($cpage=='EventDashboard')?'active':''?>"><a href="../pages/EventDashboard.php"><i class="fa fa-home"></i><span>Event</span></a></li>
-        <li id="menu-login" class="<?=@($cpage=='LoginActivityDashboard')?'active':''?>"><a href="../pages/LoginActivityDashboard.php"><i class="fa fa-history"></i><span>Login Tracker</span></a></li>
-        <li id="menu-reports" class="<?=@($cpage=='Reports')?'active':''?>"><a href="../pages/UMReport.php"><i class="fa fa-book fa-fw" aria-hidden="true" ></i><span>Reports</span></a></li>
         <li id="menu-reports" class="<?=@($cpage=='advancedashboard')?'active':''?>"><a href="advancedashboard.php"><i class="fa fa-inbox fa-fw" aria-hidden="true" ></i><span>Advance Request</span></a></li>
         <li id="menu-reports" class="<?=@($cpage=='approverdashboard')?'active':''?>"><a href="approverdashboard.php"><i class="fa fa-laptop fa-fw" aria-hidden="true" ></i><span>Advance Approve</span></a></li>
         <li id="menu-reports" class="<?=@($cpage=='financedashboard')?'active':''?>"><a href="financedashboard.php"><i class="fa fa-money fa-fw" aria-hidden="true" ></i><span>Advance Payment Approve</span></a></li>
@@ -357,26 +354,9 @@ margin-right: -40px;"> --></a> </header>
         <!-- Navbar Toolbar -->
         <ul class="nav navbar-toolbar">     
 		 <li class="nav-item hidden-float">
-            <a class="nav-link" href="" role="button">A & P Portal</a>
+            <a class="nav-link" href="" role="button">A & P Expenses</a>
           </li>
-			<?php
-			if($cpage=='EventDashboard'){?>
-          <li class="nav-item hidden-float active">
-            <a class="nav-link" href="EventDashboard.php" role="button">Event</a>
-          </li>
-			<?php }elseif($cpage=='UMReport'){   ?>
-          <li class="nav-item hidden-float active">
-            <a class="nav-link" href="UMReport.php" role="button">Reports</a>
-          </li> 
-			<?php }elseif($cpage=='PDTrailDashBoard'){ ?>
-           <li class="nav-item hidden-float active">
-            <a class="nav-link" href="PDTrailDashBoard.php" role="button">Observation</a>
-          </li> 
-			<?php }elseif($cpage=='LoginActivityDashboard'){ ?>
-          <li class="nav-item hidden-float <?=@($cpage=='LoginActivityDashboard')?"active":""?>">
-            <a class="nav-link" href="LoginActivityDashboard.php" role="button">Login Tracker</a>
-          </li> 
-			<?php }elseif($cpage=='advancedashboard'){ ?>
+			<?php if($cpage=='advancedashboard'){ ?>
           <li class="nav-item hidden-float active">
             <a class="nav-link" href="advancedashboard.php" role="button">Advance Request</a>
           </li> 

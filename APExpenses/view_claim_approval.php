@@ -497,7 +497,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                         <td><?php echo $rows['SUBACTIVITY']; ?></td>
                         <td align="right"><?php echo $rows['SettledAmt']; ?></td> 
                         <td align="right"><?php echo $rows['ApprovedAmt']; ?></td> 
-                        <td><a href="claim_approval.php?sid=<?php echo $rows['SId']; ?>">&nbsp; View &nbsp;</a></td>
+                        <td><a href="claim_approval.php?sid=<?php echo $rows['SId']; ?>"> View </a></td>
                       </tr>
                     <?php  } ?>
                     </tbody>

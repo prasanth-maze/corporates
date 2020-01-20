@@ -679,6 +679,18 @@ h3.panel-title {
 </div>
   <!-- End Page -->
 <script type="text/javascript">
+  $(document).ready(function(){
+    var login_type = $(".login_type").val();
+      if(login_type =='RBM'){
+          region_dets();
+          division_dets(); 
+      }else if(login_type =='TM'){
+        division_dets();
+        region_dets();
+      }else if(login_type =='ADMIN'){
+      }else if(login_type =='ZM'){
+      }
+});
   $(document).on('submit','.adv_submit',function(){
     var error_count=validation();
     if(error_count == 0){
@@ -692,21 +704,7 @@ h3.panel-title {
       $(this).html((key+1));
     });
   }
-  $(document).ready(function(){
-    var login_type = $(".login_type").val();
-// alert(login_type);
 
-      if(login_type =='RBM'){
-          region_dets();
-          division_dets(); 
-      }else if(login_type =='TM'){
-        division_dets();
-        region_dets();
-      }else{
-        division_dets();
-        region_dets();
-      }
-  });
 /* Region level login disable for Division */
 function division_dets(){
 var val        = $(".cls_division").val();
