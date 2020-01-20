@@ -468,6 +468,9 @@ h3.panel-title {
 .bold_total {
     font-weight: 900;
 }
+.tbl-select .select2-container {
+  width: 280px !important;
+}
 </style>
 
 <body class="animsition site-navbar-small dashboard" style="font-size: small;">
@@ -592,7 +595,7 @@ h3.panel-title {
 
           <h3>Advance Amount</h3>
           <div class="col-xs-12">
-          <table class="table">
+          <table class="table tbl-select" id="">
             <thead>
               <th>S.No.</th>
               <th>Crop</th>
