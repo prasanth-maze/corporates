@@ -514,7 +514,7 @@ h3.panel-title {
           </table>
               </div>
               <div class="row mb-3">
-              <label class="control-label col-md-1 text-center" for="name">Remark <span class="required">*</span></label>
+              <label class="control-label col-md-1 text-center" for="name">Remark </label>
                 <div class="col-md-8">
                 <textarea name="common_remark" class="form-control" rows="2"></textarea>
               </div>          

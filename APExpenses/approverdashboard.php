@@ -2,12 +2,11 @@
 include 'header.php';
 ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <!-- select 2 -->
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
-  <!-- datatables coumn visibility -->
-  <link href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css" rel="stylesheet" />
-  <link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
-
+<!-- select 2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
+<!-- datatables coumn visibility -->
+<link href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="../global/vendor/bootstrap-datepicker/bootstrap-datepicker.minfd53.css?v4.0.1">
 <link rel="stylesheet" href="../global/vendor/timepicker/jquery-timepicker.minfd53.css?v4.0.1">
 <link rel="stylesheet" href="../assets/css/menu.css">
@@ -188,7 +187,7 @@ div#myDIV {
     display: none !important;
 }
 .page-content {
-    padding: 23px 0px 30px 0px;
+    padding: 10px 10px 30px 0px;
 }
 .page {
     padding-left: 4.3%;
@@ -208,6 +207,71 @@ h3.panel-title {
     font-size: 15px;
     margin: 0 12px;
 }
+/* dashboard */
+.expense-dash .card {
+    background: #e69c33;
+    margin-bottom: 0;
+    height: auto;
+
+}
+.expense-dash .card1, .expense-dash .card2, .expense-dash .card3, .expense-dash .card4 { 
+  margin: 0 0px 30px 0;
+}
+.expense-dash .card .media {
+    padding: 10px;
+    height: 90px;
+}
+.expense-dash .media img {
+    max-width: 37px;
+}
+.expense-dash .card h5 {
+    padding: 6px 0px;
+    text-align: right;
+    margin: 0;
+}
+.expense-dash .card h5 a{
+  color:#fff; font-size: 14px;
+}
+.expense-dash .card h5 {
+    padding: 6px 5px;
+    text-align: right;
+    margin: 0;
+    background: #0000002e;
+}
+.expense-dash .card .media-body h4 b {
+    font-size: 30px;
+    color: #fff;
+    font-weight: bold; padding: 0 10px;
+}
+.expense-dash .card .media-body h4 {
+    color: #fff;
+    padding: 0 6px;     text-align: center;
+}
+.card2 {
+  background: #e15349 !important;
+}
+.card3 {
+  background: #885081 !important; 
+}
+.card4 {
+  background: #c72638 !important;
+}
+.card5 {
+  background: #1363ba !important;
+}
+.card6 {
+  background: #f43602 !important; 
+}
+.card7 {
+  background: #86711e !important;
+}
+.card8 {
+  background: #08a5aa !important;
+}
+.expense-dash {
+    padding: 10px;
+    background: #fff;
+}
 </style>
 
 <body class="animsition site-navbar-small dashboard" style="font-size: small;">
@@ -215,148 +279,145 @@ h3.panel-title {
     <div id="loader"></div>
 </div>
 </div>
+<?php include 'top_nav.php'; ?>
 <?php
+ 
+    $anp_adv ="SELECT COUNT(AdvId) AS tot_adv FROM ANP_Advance WHERE CurrentStatus='1' ";
+    $wait_approval.="SELECT COUNT(AdvId) AS tot_adv_pend,SUM(AdvAmount) As tot_advamt_pend FROM ANP_Advance_Amount WHERE CurrentStatus='1' AND ApprovedAmount!=null ";
+    if($_SESSION['Dcode'] == 'ZM'){
 
-include 'top_nav.php';
+    }else if($_SESSION['Dcode'] == 'RBM'){
 
+    }else if($_SESSION['Dcode'] == 'TM'){
+      $anp_adv.=" AND ANP_Advance.AdvanceTo='".$_SESSION['EmpID']."'";
+    }
+    $wait_approval.=" GROUP BY ANP_Advance_Amount.AdvId";
+    
+    $anpadv       = sqlsrv_query($conn,$anp_adv);
+    $fetch_anp    = sqlsrv_fetch_array($anpadv);
+    $tot_adv_req  = $fetch_anp['tot_adv'];
+
+    $anpwait    = sqlsrv_query($conn,$wait_approval);
+    $fetch_wait = sqlsrv_fetch_array($anpwait);
+    $tot_pend_cout  = $fetch_wait['tot_adv_pend'];
+    $tot_pend_amt   = $fetch_wait['tot_advamt_pend'];
 ?>
-
   <!-- Page -->
   <div class="page" style="margin-top: 0px !important">
     <div class="page-content container-fluid ">
       <div class="panel panel-bordered">
             </div>
             <div class="panel-body ReportTablediv" id="ReportTablediv">
+
             <div class="container">
                 <div class="col-md-12 main-dash">
                     
-                    <img class="" alt="Approver Dashboard" src="documents/common_dash.png"> 
+                    <div class="row expense-dash">
+                   
+                      <div class="col-md-3">
+                        <div class="card card4">
+                          <div class="media">
+                            <img src="icon/icon4.png" class="img-fluid" />
+                            <div class="media-body">
+                              <h4><b>No. <?php echo 0; ?> </b> Waiting for <br/><span>Approval - Rs. <?php echo 90; ?> /-</span></h4>
+                            </div>
+                            </div>
+                            <h5><a href="#">View more <i class="fa fa-arrow-right" aria-hidden="true"></i></a></h5>
+                        </div>
+                      </div>
+                      
+                      
+                    </div>
                </br>
-               </br>
-                <div class="dash_url">
+               <div class="dash_url">
                     <a href="advance_payment_approval_view.php"> Pending Advance Requests </a>
                 </div>
+                </br>
+                
                 </div>
             </div>
+          </div>
         </div>
       </div>
-      </div>
     </div>
-  </div>      
   </div>
-  <!-- End Modal -->
-  <script>
-    $(document).ready(function() {
-    $('.js-example-basic-single').select2();
-    });
-  
-  </script>
+</div>
+<!-- select 2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
+<!-- datatables column visibility -->
+<script data-cfasync="false" src="../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script src="../global/vendor/babel-external-helpers/babel-external-helpersfd53.js?v4.0.1"></script>
+<!-- <script src="../global/vendor/jquery/jquery.minfd53.js?v4.0.1"></script> -->
+<script src="../global/vendor/popper-js/umd/popper.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/bootstrap/bootstrap.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/animsition/animsition.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/mousewheel/jquery.mousewheel.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/asscrollbar/jquery-asScrollbar.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/asscrollable/jquery-asScrollable.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/ashoverscroll/jquery-asHoverScroll.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/waves/waves.minfd53.js?v4.0.1"></script>
+<!-- Plugins -->
+<script src="../global/vendor/switchery/switchery.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/intro-js/intro.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/screenfull/screenfull.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/slidepanel/jquery-slidePanel.minfd53.js?v4.0.1"></script>
+<!-- Plugins For This Page -->
+<script src="../global/vendor/chartist/chartist.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/chartist-plugin-tooltip/chartist-plugin-tooltip.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/jvectormap/jquery-jvectormap.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/jvectormap/maps/jquery-jvectormap-world-mill-enfd53.js?v4.0.1"></script>
+<script src="../global/vendor/matchheight/jquery.matchHeight-minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/peity/jquery.peity.minfd53.js?v4.0.1"></script>
+<!-- Scripts -->
+<script src="../global/js/State.minfd53.js?v4.0.1"></script>
+<script src="../global/js/Component.minfd53.js?v4.0.1"></script>
+<script src="../global/js/Plugin.minfd53.js?v4.0.1"></script>
+<script src="../global/js/Base.minfd53.js?v4.0.1"></script>
+<script src="../global/js/Config.minfd53.js?v4.0.1"></script>
 
-<script type="text/javascript">   
+<script src="../assets/js/Section/Menubar.minfd53.js?v4.0.1"></script>
+<script src="../assets/js/Section/Sidebar.minfd53.js?v4.0.1"></script>
+<script src="../assets/js/Section/PageAside.minfd53.js?v4.0.1"></script>
+<script src="../assets/js/Plugin/menu.minfd53.js?v4.0.1"></script>
 
-   $(document).ready(function() {
-      // var DivisionRestbl = $("#DivisionRestbl").DataTable();    
-      // $('#DivisionRestbl').DataTable( {
-      //     dom: 'Bfrtip',
-      //     buttons: [
-      //         'colvis'
-      //     ]
-      // } );
+<!-- Config -->
+<script src="../global/js/config/colors.minfd53.js?v4.0.1"></script>
+<script src="../assets/js/config/tour.minfd53.js?v4.0.1"></script>
+<!-- Page -->
 
+<script src="../assets/js/Site.minfd53.js?v4.0.1"></script>
+<script src="../global/js/Plugin/asscrollable.minfd53.js?v4.0.1"></script>
+<script src="../global/js/Plugin/slidepanel.minfd53.js?v4.0.1"></script>
+<script src="../global/js/Plugin/switchery.minfd53.js?v4.0.1"></script>
 
-     $('#DivisionRestbl').DataTable( {
-         orderCellsTop: true,
-         fixedHeader: true,
-         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-         dom: 'lBfrtip',
-         "scrollX": true,
-         "scrollY":300,
-         buttons: [
-           
-           'colvis'
-       ]
-     } );
- } );
- </script>
-    <!-- select 2 -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>
-    <!-- datatables column visibility -->
-  <script data-cfasync="false" src="../cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="../global/vendor/babel-external-helpers/babel-external-helpersfd53.js?v4.0.1"></script>
-  <!-- <script src="../global/vendor/jquery/jquery.minfd53.js?v4.0.1"></script> -->
-  <script src="../global/vendor/popper-js/umd/popper.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/bootstrap/bootstrap.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/animsition/animsition.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/mousewheel/jquery.mousewheel.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/asscrollbar/jquery-asScrollbar.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/asscrollable/jquery-asScrollable.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/ashoverscroll/jquery-asHoverScroll.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/waves/waves.minfd53.js?v4.0.1"></script>
+<script src="../global/js/Plugin/matchheight.minfd53.js?v4.0.1"></script>
+<script src="../global/js/Plugin/jvectormap.minfd53.js?v4.0.1"></script>
+<script src="../global/js/Plugin/peity.minfd53.js?v4.0.1"></script>
+<script src="../assets/examples/js/dashboard/v1.minfd53.js?v4.0.1"></script>
 
-  <!-- Plugins -->
-  <script src="../global/vendor/switchery/switchery.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/intro-js/intro.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/screenfull/screenfull.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/slidepanel/jquery-slidePanel.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/bootstrap-datepicker/bootstrap-datepicker.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/timepicker/jquery.timepicker.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datepair/datepair.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datepair/jquery.datepair.minfd53.js?v4.0.1"></script>
+<script src="../global/js/Plugin/bootstrap-datepicker.minfd53.js?v4.0.1"></script>
+<script src="../global/js/Plugin/datepair.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datatables.net/jquery.dataTablesfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datatables.net-bs4/dataTables.bootstrap4fd53.js?v4.0.1"></script>
+<script src="../global/vendor/datatables.net-fixedheader/dataTables.fixedHeader.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datatables.net-fixedcolumns/dataTables.fixedColumns.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datatables.net-rowgroup/dataTables.rowGroup.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datatables.net-scroller/dataTables.scroller.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datatables.net-responsive/dataTables.responsive.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datatables.net-responsive-bs4/responsive.bootstrap4.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datatables.net-buttons/dataTables.buttons.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datatables.net-buttons/buttons.html5.minfd53.js?v4.0.1"></script>
+<!-- <script src="../global/vendor/datatables.net-buttons/buttons.flash.minfd53.js?v4.0.1"></script> -->
+<script src="../global/vendor/datatables.net-buttons/buttons.print.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datatables.net-buttons/buttons.colVis.minfd53.js?v4.0.1"></script>
+<script src="../global/vendor/datatables.net-buttons-bs4/buttons.bootstrap4.minfd53.js?v4.0.1"></script>
 
-  <!-- Plugins For This Page -->
-  <script src="../global/vendor/chartist/chartist.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/chartist-plugin-tooltip/chartist-plugin-tooltip.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/jvectormap/jquery-jvectormap.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/jvectormap/maps/jquery-jvectormap-world-mill-enfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/matchheight/jquery.matchHeight-minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/peity/jquery.peity.minfd53.js?v4.0.1"></script>
-
-  <!-- Scripts -->
-  <script src="../global/js/State.minfd53.js?v4.0.1"></script>
-  <script src="../global/js/Component.minfd53.js?v4.0.1"></script>
-  <script src="../global/js/Plugin.minfd53.js?v4.0.1"></script>
-  <script src="../global/js/Base.minfd53.js?v4.0.1"></script>
-  <script src="../global/js/Config.minfd53.js?v4.0.1"></script>
-
-  <script src="../assets/js/Section/Menubar.minfd53.js?v4.0.1"></script>
-  <script src="../assets/js/Section/Sidebar.minfd53.js?v4.0.1"></script>
-  <script src="../assets/js/Section/PageAside.minfd53.js?v4.0.1"></script>
-  <script src="../assets/js/Plugin/menu.minfd53.js?v4.0.1"></script>
-
-  <!-- Config -->
-  <script src="../global/js/config/colors.minfd53.js?v4.0.1"></script>
-  <script src="../assets/js/config/tour.minfd53.js?v4.0.1"></script>
-  <!-- Page -->
-
-  <script src="../assets/js/Site.minfd53.js?v4.0.1"></script>
-  <script src="../global/js/Plugin/asscrollable.minfd53.js?v4.0.1"></script>
-  <script src="../global/js/Plugin/slidepanel.minfd53.js?v4.0.1"></script>
-  <script src="../global/js/Plugin/switchery.minfd53.js?v4.0.1"></script>
-
-  <script src="../global/js/Plugin/matchheight.minfd53.js?v4.0.1"></script>
-  <script src="../global/js/Plugin/jvectormap.minfd53.js?v4.0.1"></script>
-  <script src="../global/js/Plugin/peity.minfd53.js?v4.0.1"></script>
-  <script src="../assets/examples/js/dashboard/v1.minfd53.js?v4.0.1"></script>
-  
-  <script src="../global/vendor/bootstrap-datepicker/bootstrap-datepicker.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/timepicker/jquery.timepicker.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datepair/datepair.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datepair/jquery.datepair.minfd53.js?v4.0.1"></script>
-  <script src="../global/js/Plugin/bootstrap-datepicker.minfd53.js?v4.0.1"></script>
-  <script src="../global/js/Plugin/datepair.minfd53.js?v4.0.1"></script>
-    <script src="../global/vendor/datatables.net/jquery.dataTablesfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datatables.net-bs4/dataTables.bootstrap4fd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datatables.net-fixedheader/dataTables.fixedHeader.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datatables.net-fixedcolumns/dataTables.fixedColumns.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datatables.net-rowgroup/dataTables.rowGroup.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datatables.net-scroller/dataTables.scroller.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datatables.net-responsive/dataTables.responsive.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datatables.net-responsive-bs4/responsive.bootstrap4.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datatables.net-buttons/dataTables.buttons.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datatables.net-buttons/buttons.html5.minfd53.js?v4.0.1"></script>
-  <!-- <script src="../global/vendor/datatables.net-buttons/buttons.flash.minfd53.js?v4.0.1"></script> -->
-  <script src="../global/vendor/datatables.net-buttons/buttons.print.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datatables.net-buttons/buttons.colVis.minfd53.js?v4.0.1"></script>
-  <script src="../global/vendor/datatables.net-buttons-bs4/buttons.bootstrap4.minfd53.js?v4.0.1"></script>
-
-  <script src="../global/js/Plugin/datatables.minfd53.js?v4.0.1"></script>
-  <script src="../assets/js/menu.js?v4.0.1"></script>
-  <!-- <script src="chartGen.js"></script> -->
+<script src="../global/js/Plugin/datatables.minfd53.js?v4.0.1"></script>
+<script src="../assets/js/menu.js?v4.0.1"></script>
+<!-- <script src="chartGen.js"></script> -->
 </body>
-<!-- Mirrored from getbootstrapadmin.com/remark/material/topbar/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Mon, 25 Mar 2019 07:29:07 GMT -->
 </html>

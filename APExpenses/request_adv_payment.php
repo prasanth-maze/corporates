@@ -86,7 +86,7 @@ if(isset($_REQUEST['submit'])){
           // if($inserts)
           // { 
             // echo "<script type='text/javascript'>alert('Thank You </br> Your Request ID Is $request_id </br> Advance Payment of Rs. $total_paid_amt has been paid')</script>";
-            echo '<script type="text/javascript"> window.location.replace("advance_payment_view.php"); </script>';
+            // echo '<script type="text/javascript"> window.location.replace("advance_payment_view.php"); </script>';
             echo "<script>window.location='request_adv_payment.php?request_id=".$request_id."'</script>";
 
           //  } else {      
@@ -369,8 +369,8 @@ h3.panel-title {
             <div id="popdiv">
               <h1> Thank You ! </h1>
               <h3>  
-                  Your Request ID is <?php echo $_REQUEST['request_id']; ?>. </br>
-                  Advance Request is Send for Approval.</br>
+                  Request ID is <?php echo $_REQUEST['request_id']; ?>. </br>
+                  Advance has been Paid.</br>
               </h3>
               <button id="but2">Close</button>
             </div>

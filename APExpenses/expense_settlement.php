@@ -610,62 +610,62 @@ h3.panel-title {
               <th>Attachment</th>
               <th>Action</th>
             </thead>
-            
-            <tbody><tr>
-                  <td class='srn_no' >1</td>
-                  <td >
-                    <div class="input-daterange input-group" data-plugin="datepicker" data-date-format="dd-mm-yyyy">
-                        <input type="text" class="form-control required_for_valid"  name="claim_date_frm[]" value="<?php echo date('d-m-Y'); ?>">
-                      </div>
-                  </td>
-                  <td >
-                    <div class="input-daterange input-group" data-plugin="datepicker" data-date-format="dd-mm-yyyy">
-                        <input type="text" class="form-control required_for_valid"  name="claim_date_to[]" value="<?php echo date('d-m-Y'); ?>">
-                      </div>
-                  </td>
-                  <!-- <td><div>
-                  <select class="js-example-basic-single required_for_valid cls_expense_group" name="exp_group_id[]">
-                  <option value="">Select Expense Group </option>
+            <tbody>
+              <tr>
+                <td class='srn_no'>1</td>
+                <td >
+                  <div class="input-daterange input-group" data-plugin="datepicker" data-date-format="dd-mm-yyyy">
+                    <input type="text" class="form-control required_for_valid"  name="claim_date_frm[]" value="<?php echo date('d-m-Y'); ?>">
+                    </div>
+                </td>
+                <td >
+                  <div class="input-daterange input-group" data-plugin="datepicker" data-date-format="dd-mm-yyyy">
+                    <input type="text" class="form-control required_for_valid"  name="claim_date_to[]" value="<?php echo date('d-m-Y'); ?>">
+                    </div>
+                </td>
+                <!-- <td><div>
+                <select class="js-example-basic-single required_for_valid cls_expense_group" name="exp_group_id[]">
+                <option value="">Select Expense Group </option>
+                  <?php
+                      $grp =sqlsrv_query($conn,"SELECT DISTINCT Id,ExpenseGroupName  FROM ANP_Claim_Expenses_Group  WHERE CurrentStatus=1");
+                      while($f_grp = sqlsrv_fetch_array($grp)){
+                  ?>
+                  <option value="<?php echo $f_grp['Id']; ?>"><?php echo $f_grp['ExpenseGroupName']; ?></option>
+                      <?php } ?>
+                </select></div>
+                </td> -->
+                <!-- <td><div>
+                <select class="js-example-basic-single required_for_valid cls_expense_head" name="exp_head_id[]">
+                <option value="">Select Expense Head </option>
+                  
+                </select></div>                  
+                </td> -->
+                <td>
+                  <div> 
+                    <select class="js-example-basic-single form-control required_for_valid cls_expense_category" name="exp_category_id[]">
+                    <option value="">Select Expense Category </option>
                     <?php
-                        $grp =sqlsrv_query($conn,"SELECT DISTINCT Id,ExpenseGroupName  FROM ANP_Claim_Expenses_Group  WHERE CurrentStatus=1");
-                        while($f_grp = sqlsrv_fetch_array($grp)){
-                    ?>
-                    <option value="<?php echo $f_grp['Id']; ?>"><?php echo $f_grp['ExpenseGroupName']; ?></option>
-                        <?php } ?>
-                  </select></div>
-                  </td> -->
-                  <!-- <td><div>
-                  <select class="js-example-basic-single required_for_valid cls_expense_head" name="exp_head_id[]">
-                  <option value="">Select Expense Head </option>
-                    
-                  </select></div>                  
-                  </td> -->
-                  <td>
-                    <div> 
-                      <select class="js-example-basic-single form-control required_for_valid cls_expense_category" name="exp_category_id[]">
-                      <option value="">Select Expense Category </option>
-                      <?php
-                          $category =sqlsrv_query($conn,"SELECT DISTINCT Id,ExpenseCategoryName  FROM ANP_Claim_Expenses_Category WHERE CurrentStatus=1");
-                          while($r_category = sqlsrv_fetch_array($category)){
-                        ?>
-                        <option value="<?php echo $r_category['Id']; ?>"><?php echo $r_category['ExpenseCategoryName']; ?></option>
-                        <?php } ?>
-                      </select>
-                    </div> 
-                  </td>
+                        $category =sqlsrv_query($conn,"SELECT DISTINCT Id,ExpenseCategoryName  FROM ANP_Claim_Expenses_Category WHERE CurrentStatus=1");
+                        while($r_category = sqlsrv_fetch_array($category)){
+                      ?>
+                      <option value="<?php echo $r_category['Id']; ?>"><?php echo $r_category['ExpenseCategoryName']; ?></option>
+                      <?php } ?>
+                    </select>
+                  </div> 
+                </td>
 
-                  <!-- Bill NO -->
-                  <td><div><input type="text" class="form-control required_for_valid " name="bill_no[]"/></div></td>
-                  <td><div><input type="text" class="form-control required_for_valid " name="vendor_name[]"/></div></td>
-                  <td><div><input type="text" class="form-control" name="gst_no[]"/></div></td>
-                  <td><div><input type="text" class="form-control required_for_valid right each_sum_amt1 max_charater only_numbers cls_amt1" name="base_amt[]"/></div></td>
-                  <td><div><input type="text" class="form-control required_for_valid right each_sum_amt2 max_charater only_numbers cls_amt2" name="gst_amt[]"/></div></td>
-                  <td><div><input type="text" class="form-control right only_numbers cls_amt_ans" readonly name="tot_amt[]"/></div></td>
-                  <td><div id="custom-upload"><button ><i class="fa fa-upload" aria-hidden="true"></i></button><input type="file" name="atch_file[]"></div></td>
-                  <td>
-                    <button type="button" onclick ='add_row()' class="btn btn-success">+</button>
-                  </td> 
-                </tr>
+                <!-- Bill NO -->
+                <td><div><input type="text" class="form-control required_for_valid " name="bill_no[]"/></div></td>
+                <td><div><input type="text" class="form-control required_for_valid " name="vendor_name[]"/></div></td>
+                <td><div><input type="text" class="form-control" name="gst_no[]"/></div></td>
+                <td><div><input type="text" class="form-control required_for_valid right each_sum_amt1 max_charater only_numbers cls_amt1" name="base_amt[]"/></div></td>
+                <td><div><input type="text" class="form-control required_for_valid right each_sum_amt2 max_charater only_numbers cls_amt2" name="gst_amt[]"/></div></td>
+                <td><div><input type="text" class="form-control right only_numbers cls_amt_ans" readonly name="tot_amt[]"/></div></td>
+                <td><div id="custom-upload"><button ><i class="fa fa-upload" aria-hidden="true"></i></button><input type="file" name="atch_file[]"></div></td>
+                <td>
+                  <button type="button" onclick ='add_row()' class="btn btn-success">+</button>
+                </td> 
+              </tr>
           
             </tbody>
            <tfoot>
@@ -740,7 +740,7 @@ h3.panel-title {
             </div>
 
             <div class="row mb-3">
-              <label class="control-label col-md-1 text-center" for="name">Remark <span class="required">*</span></label>
+              <label class="control-label col-md-1 text-center" for="name">Remark </label>
                 <div class="col-md-9">
                 <textarea name="common_remark" class="form-control" rows="2"></textarea>
               </div>          
@@ -789,8 +789,219 @@ h3.panel-title {
   <option value="<?php echo $r_adv_reqs['AdvId']; ?>"><?php echo $r_adv_reqs['ReqId']; ?></option>
   <?php } ?>
 </div>
+<!-- START POP -->
+<!-- <div class="modal fade" id="modal_fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Event Details</h4>
+            </div>
+            <div class="modal-body modal_fade_content">
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div> -->
 
 
+<div class="modal fade modal-rotate-from-bottom" id="ResultModal"
+                    aria-hidden="true" aria-labelledby="exampleModalTitle" role="dialog"
+                    tabindex="-1" >
+                    <div class="modal-dialog modal-simple">
+                      <div class="modal-content" style="width: 130%;margin-left:-12%">
+                        <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span>
+                          </button>
+                          <h4 class="modal-title">Event Details</h4>
+                        </div>
+                        <div class="modal-body">
+                <div class="nav-tabs-horizontal" data-plugin="tabs">
+                  <ul class="nav nav-tabs" role="tablist">
+                     <li class="nav-item" role="presentation"><a class="nav-link ptabs active exampleTabsOne" data-toggle="tab" href="#exampleTabsOne"
+                        aria-controls="exampleTabsOne" role="tab">Event Details</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link ptabs" data-toggle="tab" href="#exampleTabsTwo"
+                        aria-controls="exampleTabsTwo" role="tab">Images</a></li>
+                    <li class="nav-item" role="presentation"><a class="nav-link ptabs" data-toggle="tab" href="#exampleTabsThree"
+                        aria-controls="exampleTabsThree" role="tab">Map</a></li>
+                  </ul>
+                  <div class="tab-content pt-20">
+                    <div class="tab-pane popres-pane  active" id="exampleTabsOne" role="tabpanel">
+                      <div class="row">
+                                     <div class="col-sm-6">
+              <div class="form-horizontal">              
+                <div class="row modal-form">
+                    <label class="col-sm-6 control-label">PO Code:</label>
+                    <label class="col-sm-6 respopdata respopdata1"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">PO Name:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata2"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">HQ Code:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata3"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">HQ Name:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata4"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Event Code:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata5"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Activity Date:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata6"></label>
+                  </div>
+                 
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Financial Type:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata7"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Activity Type:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata8"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Sub Type:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata9"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Territory:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata10"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Taluk/Mandal:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata11"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Village Name:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata12"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Farmer Name:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata13"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Mobile No:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata14"></label>
+                  </div>
+                   
+
+
+              </div>
+            </div>
+                      <div class="col-sm-6">
+              <div class="form-horizontal">              
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Crop Name:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata15"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Product:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata16"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Crop Condition:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata17"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Status:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata18"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Observations:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata19"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Solutions:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata20"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">Visit No:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata21"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">TMCode & Name:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata22"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">RBM Code & Name:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata23"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">DBM Code & Name:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata24"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">No of Farmers Covered:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata25"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">No of Villages Covered:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata26"></label>
+                  </div>
+                  <div class="row modal-form">
+                    <label class="col-sm-6 control-label">No of Dealers Covered:</label>
+                    <label name="" class="col-sm-6 respopdata respopdata27"></label>
+                  </div>
+
+              </div>
+            </div>
+                      </div>
+
+                    </div>
+                    <div class="tab-pane popres-pane" id="exampleTabsTwo" role="tabpanel">
+                       <div class="row">
+                  <div class="col-6 col-md-3">
+                    <div class="example">
+                      <div class="card">
+                        <img class="img-fluid w-full respopdata eimage1" src="" alt="..." data-type="image">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="example">
+                      <div class="card">
+                        <img class="img-fluid w-full respopdata eimage2" src="" alt="..." data-type="image">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-6 col-md-3">
+                    <div class="example">
+                      <div class="card">
+                       <img class="img-fluid w-full respopdata eimage3" src="" alt="..." data-type="image">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                    </div>
+                    <div class="tab-pane popres-pane" id="exampleTabsThree" role="tabpanel">
+                      <div class="example">
+                      <div class="card">
+					  Coming soon..
+					  </div>
+					  </div>
+                      </div>
+                    </div>
+                  </div>
+				   </div>
+                        <div class="modal-footer">
+                          <button type="button" class="btn btn-primary btn-pure" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+
+
+
+<!-- END POP -->
   <!-- End Page -->
 <script type="text/javascript">
   $(document).on('submit','.adv_submit',function(){
@@ -807,17 +1018,16 @@ h3.panel-title {
   });
 /* User Acccess */
 
-$(document).ready(function(){
-  var login_type = $(".login_type").val();
+  $(document).ready(function(){
+    var login_type = $(".login_type").val();
       if(login_type =='RBM'){
           region_dets();
           division_dets(); 
       }else if(login_type =='TM'){
         division_dets();
         region_dets();
-      }else{
-        division_dets();
-        region_dets();
+      }else if(login_type =='ADMIN'){
+      }else if(login_type =='ZM'){
       }
   });
 /* Region level login disable for Division */
@@ -950,6 +1160,10 @@ function get_region(val) {
   $(document).on("click",".event_list",function(){
     var activity_text = $(".cls_activity option:selected").text();
     var sub_activity_text = $(".cls_sub_activity option:selected").text();
+    var sub_activity_val = $(".cls_sub_activity option:selected").val();
+    if(sub_activity_val ==''){
+      return;
+    }
     $.ajax
       ({
         type: "POST",
@@ -1005,9 +1219,6 @@ function get_region(val) {
   }
 
   function add_row(){
-    //<td><div><select class='js-example-basic-single form-control required_for_valid cls_expense_group' name='exp_group_id[]'><option value=''>Select Expense Group </option>"+ $('.group_div').html() +"</select></div></td><td><div><select class='js-example-basic-single   form-control required_for_valid cls_expense_head' name='exp_head_id[]'><option value=''>Select Expense Head </option></select></div></td>
-
-    
       var markup = "<tr><td class='srn_no'></td><td><div class='input-daterange input-group' data-plugin='datepicker' data-date-format='dd-mm-yyyy'><input type='text' class='form-control required_for_valid '  name='claim_date_frm[]' value='<?php echo date('d-m-Y'); ?>'></div></td><td><div class='input-daterange input-group' data-plugin='datepicker' data-date-format='dd-mm-yyyy'><input type='text' class='form-control required_for_valid '  name='claim_date_to[]' value='<?php echo date('d-m-Y'); ?>'></div></td> <td><div><select class='js-example-basic-single form-control  required_for_valid cls_expense_category' name='exp_category_id[]'><option value=''>Select Expense Category </option>"+ $('.category_div').html() +"</select></div></td><td><div><input type='text' class='form-control required_for_valid ' name='bill_no[]'/></div></td><td><div><input type='text' class='form-control required_for_valid ' name='vendor_name[]'/></div></td><td><div><input type='text' class='form-control' name='gst_no[]'/></div></td><td><div><input type='text' class='form-control required_for_valid each_sum_amt1 right max_charater only_numbers cls_amt1' name='base_amt[]'/></div></td><td><div><input type='text' class='form-control required_for_valid each_sum_amt2 right max_charater only_numbers cls_amt2' name='gst_amt[]'/></div></td><td><div><input type='text' class='form-control right only_numbers cls_amt_ans' readonly name='tot_amt[]'/></div></td><td><div id='custom-upload'><button ><i class='fa fa-upload' aria-hidden='true'></i></button><input type='file' name='atch_file[]'></div></td><td><button type='button' onclick ='add_row()' class='btn btn-success'>+</button> <button class='delete btn btn-danger' onclick ='delete_user($(this))'>X</button></td></tr>";
       $("#expense_claim > tbody").append(markup);
       s_no();
@@ -1030,6 +1241,56 @@ function get_region(val) {
   {
     row.closest('tr').remove();
   }
+
+
+  $(document).on("click", ".edit_btn", function (){
+        var $tr = $(this).closest("tr");
+        var event_id = $tr.find(".event_id").val();
+        $.ajax({
+            type: "POST",
+            url: "ajax_popup_details.php",
+            data: {
+                event_id: event_id,
+				        action_type:"EXP_CLAIM_EVENT_DETAILS"
+            },
+            success: function (output) {
+              var rowdata = JSON.parse(output);
+              $(".respopdata1").text(rowdata[1]);
+              $(".respopdata2").text(rowdata[2]);
+              $(".respopdata3").text(rowdata[3]);
+              $(".respopdata4").text(rowdata[4]);
+              $(".respopdata5").text(rowdata[5]);
+              $(".respopdata6").text(rowdata[6]);
+              $(".respopdata7").text(rowdata[7]);
+              $(".respopdata8").text(rowdata[8]);
+              $(".respopdata9").text(rowdata[9]);
+              $(".respopdata10").text(rowdata[10]);
+              $(".respopdata11").text(rowdata[11]);
+              $(".respopdata12").text(rowdata[12]);
+              $(".respopdata13").text(rowdata[13]);
+              $(".respopdata14").text(rowdata[14]);
+              $(".respopdata15").text(rowdata[15]);
+              $(".respopdata16").text(rowdata[16]);
+              $(".respopdata17").text(rowdata[17]);
+              $(".respopdata18").text(rowdata[18]);
+              $(".respopdata19").text(rowdata[19]);
+              $(".respopdata20").text(rowdata[20]);
+              $(".respopdata21").text(rowdata[21]);
+              $(".respopdata22").text(rowdata[22],rowdata[32]);
+              $(".respopdata23").text(rowdata[23],rowdata[33]);
+              $(".respopdata24").text(rowdata[24],rowdata[34]);
+              $(".respopdata25").text(rowdata[25]);
+              $(".respopdata26").text(rowdata[26]);
+              $(".respopdata27").text(rowdata[27]);
+              
+              $(".eimage1").prop('src',rowdata[28]);
+              $(".eimage2").prop('src',rowdata[29]);
+              $(".eimage3").prop('src',rowdata[30]);
+              
+              $("#ResultModal").modal('show');
+            }
+        });
+    });
 </script>
 <!-- select 2 -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/js/select2.min.js"></script>

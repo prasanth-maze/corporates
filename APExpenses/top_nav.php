@@ -269,14 +269,23 @@ margin-right: -40px;"> --></a> </header>
     <div style="border-top:1px solid rgba(69, 74, 84, 0.7)"></div>
     <div class="menu">
       <ul id="menu" >
-        <li id="menu-reports" class="<?=@($cpage=='advancedashboard')?'active':''?>"><a href="advancedashboard.php"><i class="fa fa-inbox fa-fw" aria-hidden="true" ></i><span>Advance Request</span></a></li>
-        <li id="menu-reports" class="<?=@($cpage=='approverdashboard')?'active':''?>"><a href="approverdashboard.php"><i class="fa fa-laptop fa-fw" aria-hidden="true" ></i><span>Advance Approve</span></a></li>
-        <li id="menu-reports" class="<?=@($cpage=='financedashboard')?'active':''?>"><a href="financedashboard.php"><i class="fa fa-money fa-fw" aria-hidden="true" ></i><span>Advance Payment Approve</span></a></li>
-        <li id="menu-reports" class="<?=@($cpage=='expensesclaimdashboard')?'active':''?>"><a href="expensesclaimdashboard.php"><i class="fa fa-money fa-fw" aria-hidden="true" ></i><span>Expenses Claim</span></a></li>
-        <li id="menu-reports" class="<?=@($cpage=='claimapproverdashboard')?'active':''?>"><a href="claimapproverdashboard.php"><i class="fa fa-dashboard fa-fw" aria-hidden="true" ></i><span>Expenses Approve</span></a></li>
-        <li id="menu-reports" class="<?=@($cpage=='claimfinancedashboard')?'active':''?>"><a href="claimfinancedashboard.php"><i class="fa fa-dashboard fa-fw" aria-hidden="true" ></i><span>Expenses Verification</span></a></li>
-        
-
+      <?php if($_SESSION['EmpID'] == 'RS5548' || $_SESSION['EmpID'] == 'RS5983') { ?>        
+          <li id="menu-reports" class="<?=@($cpage=='financedashboard')?'active':''?>"><a href="financedashboard.php"><i class="fa fa-money fa-fw" aria-hidden="true" ></i><span>Advance Payment Approve</span></a></li>
+          <li id="menu-reports" class="<?=@($cpage=='claimfinancedashboard')?'active':''?>"><a href="claimfinancedashboard.php"><i class="fa fa-dashboard fa-fw" aria-hidden="true" ></i><span>Expenses Verification</span></a></li>
+      <?php } else if($_SESSION['Dcode'] == 'RBM' || $_SESSION['Dcode'] == 'TM'|| $_SESSION['Dcode'] == 'ZM'){ ?>
+          <li id="menu-reports" class="<?=@($cpage=='advancedashboard')?'active':''?>"><a href="advancedashboard.php"><i class="fa fa-inbox fa-fw" aria-hidden="true" ></i><span>Advance Request</span></a></li>
+          <li id="menu-reports" class="<?=@($cpage=='approverdashboard')?'active':''?>"><a href="approverdashboard.php"><i class="fa fa-laptop fa-fw" aria-hidden="true" ></i><span>Advance Approve</span></a></li>     
+          <li id="menu-reports" class="<?=@($cpage=='expensesclaimdashboard')?'active':''?>"><a href="expensesclaimdashboard.php"><i class="fa fa-money fa-fw" aria-hidden="true" ></i><span>Expenses Claim</span></a></li>
+          <li id="menu-reports" class="<?=@($cpage=='claimapproverdashboard')?'active':''?>"><a href="claimapproverdashboard.php"><i class="fa fa-dashboard fa-fw" aria-hidden="true" ></i><span>Expenses Approve</span></a></li>
+      <?php } else { ?>
+          <li id="menu-reports" class="<?=@($cpage=='advancedashboard')?'active':''?>"><a href="advancedashboard.php"><i class="fa fa-inbox fa-fw" aria-hidden="true" ></i><span>Advance Request</span></a></li>
+          <li id="menu-reports" class="<?=@($cpage=='approverdashboard')?'active':''?>"><a href="approverdashboard.php"><i class="fa fa-laptop fa-fw" aria-hidden="true" ></i><span>Advance Approve</span></a></li>
+          <li id="menu-reports" class="<?=@($cpage=='financedashboard')?'active':''?>"><a href="financedashboard.php"><i class="fa fa-money fa-fw" aria-hidden="true" ></i><span>Advance Payment Approve</span></a></li>
+          <li id="menu-reports" class="<?=@($cpage=='expensesclaimdashboard')?'active':''?>"><a href="expensesclaimdashboard.php"><i class="fa fa-money fa-fw" aria-hidden="true" ></i><span>Expenses Claim</span></a></li>
+          <li id="menu-reports" class="<?=@($cpage=='claimapproverdashboard')?'active':''?>"><a href="claimapproverdashboard.php"><i class="fa fa-dashboard fa-fw" aria-hidden="true" ></i><span>Expenses Approve</span></a></li>
+          <li id="menu-reports" class="<?=@($cpage=='claimfinancedashboard')?'active':''?>"><a href="claimfinancedashboard.php"><i class="fa fa-dashboard fa-fw" aria-hidden="true" ></i><span>Expenses Verification</span></a></li>
+      <?php }  ?>
+      
         <!-- <li><a href="#"><i class="fa fa-share-alt"></i><span>Share</span><span class="fa fa-angle-right" style="float: right"></span></a>
           <ul>
             <li><a href="#"><i class="fa fa-facebook"></i> Facebook</a></li>

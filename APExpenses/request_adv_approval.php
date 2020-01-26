@@ -34,7 +34,8 @@ if(isset($_REQUEST['submit'])){
   $approve_remark  = $_REQUEST['approve_remark']; 
   $reamrk_update = sqlsrv_query($conn,"UPDATE ANP_Advance SET AdvApproveCommonRemark='$common_remark' WHERE AdvId = '$adv_id'" ); 
   for($i=0,$j=0;$i<sizeof($adv_amt_id);$i++,$j++){
-        $inserta = sqlsrv_query($conn,"UPDATE ANP_Advance_Amount SET ApprovedAmount='$approve_amt[$i]',ApprovedRemark='$approve_remark[$i]',ApprovedBy='$approved_by',ApprovedAt='$approved_at' WHERE Id = '$adv_amt_id[$i]'" ); 
+      $approve_amts = $approve_amt[$i] + 0; 
+      $inserta = sqlsrv_query($conn,"UPDATE ANP_Advance_Amount SET ApprovedAmount='$approve_amts',ApprovedRemark='$approve_remark[$i]',ApprovedBy='$approved_by',ApprovedAt='$approved_at' WHERE Id = '$adv_amt_id[$i]'" ); 
    }
   if(sizeof($adv_amt_id) == $j){
       $tot_appr_amt = array_sum($approve_amt); 
@@ -143,11 +144,11 @@ if(isset($_REQUEST['submit'])){
       $mail->IsHTML(true);
       $mail->Body    = $message;
       
-          if($mail->Send()) {
+          // if($mail->Send()) {
               echo "<script>window.location='request_adv_approval.php?request_id=".$request_id."'</script>";
-          }else{
-            echo '<script type="text/javascript">window.location.replace("advance_payment_approval_view.php?sts=fail");</script>'; 
-          }
+          // }else{
+          //   echo '<script type="text/javascript">window.location.replace("advance_payment_approval_view.php?sts=fail");</script>'; 
+          // }
         }else {      
             echo '<script type="text/javascript"> window.location.replace("advance_payment_approval_view.php?sts=fail");</script>';
       } 
@@ -448,6 +449,8 @@ h3.panel-title {
               <div class="col-md-4 col-sm-12 col-xs-12">
                 <div class="row">
 <?php   
+$tomail  ='';
+$Empnames ='';
   $view_part_adv = sqlsrv_query($conn,"SELECT ANP_Advance.AdvId, ANP_Advance.ReqId, CONVERT (NVARCHAR(50),ANP_Advance.ReqDate,105) as ReqDate,ANP_Advance.ReqDivisionName,  ANP_Advance.ReqRegionName, ANP_Advance.ReqTeritoryName,ANP_Advance.AdvanceTo FROM ANP_Advance LEFT JOIN RASI_POHQTABLE ON ANP_Advance.AdvanceTo=RASI_POHQTABLE.POHQCODE WHERE ANP_Advance.CurrentStatus=1 AND  ANP_Advance.AdvId=$adv_id");  
   $fetch_adv_det = sqlsrv_fetch_array($view_part_adv);
   $adv_tos = $fetch_adv_det['AdvanceTo'];

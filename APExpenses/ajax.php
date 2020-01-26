@@ -108,7 +108,7 @@ if($action_type == 'GET_EVENT_LOG_ACTIVITY'){
   $tr="";
   $i =1;
   while($f_event_log_actvity = sqlsrv_fetch_array($event_log_actvity)){
-    $tr.="<tr><td>".$i++."</td><td>".$f_event_log_actvity['EVENTCODE']."</td><td>".$f_event_log_actvity['POHQCODE']."</td> <td>".$f_event_log_actvity['POHQNAME']."</td><td>".$f_event_log_actvity['TMCODE']."</td><td>".$f_event_log_actvity['TMCODE']."</td><td>".$f_event_log_actvity['VILLAGENAME']."</td><td>".$f_event_log_actvity['TERRITORY']."</td><td>".$f_event_log_actvity['TERRITORY']."</td><td><input type='checkbox'  class='cls_event_code' name='event_code[]' value='".$f_event_log_actvity['EVENTCODE']."' </td></tr>";
+    $tr.="<tr><td>".$i++."</td><td> <input class='event_id' type='hidden' name='event_id' value='".$f_event_log_actvity['EVENTCODE']."'><a class='edit_btn'>".$f_event_log_actvity['EVENTCODE']."</a></td><td>".$f_event_log_actvity['POHQCODE']."</td> <td>".$f_event_log_actvity['POHQNAME']."</td><td>".$f_event_log_actvity['TMCODE']."</td><td>".$f_event_log_actvity['TMCODE']."</td><td>".$f_event_log_actvity['VILLAGENAME']."</td><td>".$f_event_log_actvity['TERRITORY']."</td><td>".$f_event_log_actvity['TERRITORY']."</td><td><input type='checkbox'  class='cls_event_code' name='event_code[]' value='".$f_event_log_actvity['EVENTCODE']."' </td></tr>";
   }
   echo $tr;
 }

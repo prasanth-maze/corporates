@@ -1,6 +1,10 @@
 <?php 
 include 'header.php';
-?>
+
+ if($_SESSION['EmpID'] == 'RS5548' || $_SESSION['EmpID'] == 'RS5983') { 
+  echo '<script type="text/javascript"> window.location.replace("financedashboard.php"); </script>';
+ }
+ ?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <!-- select 2 -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
@@ -280,6 +284,28 @@ h3.panel-title {
 </div>
 </div>
 <?php include 'top_nav.php'; ?>
+<?php
+ 
+    $anp_adv ="SELECT COUNT(AdvId) AS tot_adv FROM ANP_Advance WHERE CurrentStatus='1' ";
+    $wait_approval.="SELECT COUNT(AdvId) AS tot_adv_pend,SUM(AdvAmount) As tot_advamt_pend FROM ANP_Advance_Amount WHERE CurrentStatus='1' AND ApprovedAmount!=null ";
+    if($_SESSION['Dcode'] == 'ZM'){
+
+    }else if($_SESSION['Dcode'] == 'RBM'){
+
+    }else if($_SESSION['Dcode'] == 'TM'){
+      $anp_adv.=" AND ANP_Advance.AdvanceTo='".$_SESSION['EmpID']."'";
+    }
+    $wait_approval.=" GROUP BY ANP_Advance_Amount.AdvId";
+    
+    $anpadv       = sqlsrv_query($conn,$anp_adv);
+    $fetch_anp    = sqlsrv_fetch_array($anpadv);
+    $tot_adv_req  = $fetch_anp['tot_adv'];
+
+    $anpwait    = sqlsrv_query($conn,$wait_approval);
+    $fetch_wait = sqlsrv_fetch_array($anpwait);
+    $tot_pend_cout  = $fetch_wait['tot_adv_pend'];
+    $tot_pend_amt   = $fetch_wait['tot_advamt_pend'];
+?>
   <!-- Page -->
   <div class="page" style="margin-top: 0px !important">
     <div class="page-content container-fluid ">
@@ -296,19 +322,29 @@ h3.panel-title {
                           <div class="media">
                             <img src="icon/icon1.png" class="img-fluid" />
                             <div class="media-body">
-                            <h4><b>No. 176 </b> Advance<br/><span> Request</span></h4>
+                            <h4><b>No. <?php echo $tot_adv_req;?> </b> Advance<br/><span> Request</span></h4>
                             </div>
                             </div>
                             <h5><a href="#">View more <i class="fa fa-arrow-right" aria-hidden="true"></i></a></h5>
                         </div>
                       </div>
-
+                      <div class="col-md-3">
+                        <div class="card card4">
+                          <div class="media">
+                            <img src="icon/icon4.png" class="img-fluid" />
+                            <div class="media-body">
+                              <h4><b>No. <?php echo $tot_pend_cout; ?> </b> Waiting for <br/><span>Approval - Rs. <?php echo $tot_pend_amt;?></span></h4>
+                            </div>
+                            </div>
+                            <h5><a href="#">View more <i class="fa fa-arrow-right" aria-hidden="true"></i></a></h5>
+                        </div>
+                      </div>
                       <div class="col-md-3">
                         <div class="card card2">
                           <div class="media">
                             <img src="icon/icon2.png" class="img-fluid" />
                             <div class="media-body">
-                              <h4><b>No. 96 </b> Approved<br/><span></span></h4>
+                              <h4><b>No. 0 </b> Approved & Waiting for Payment - Rs. 0 <br/><span></span></h4>
                             </div>
                             </div>
                             <h5><a href="#">View more <i class="fa fa-arrow-right" aria-hidden="true"></i></a></h5>
@@ -320,25 +356,15 @@ h3.panel-title {
                           <div class="media">
                             <img src="icon/icon3.png" class="img-fluid" />
                             <div class="media-body">
-                              <h4><b>Rs. 50,600 </b><br/> Not Settled</h4>
+                              <h4><b>NO. 50 Paid </b><br/> Rs.50,600 - Advance Not Settled</h4>
                             </div>
                             </div>
                             <h5><a href="#">View more <i class="fa fa-arrow-right" aria-hidden="true"></i></a></h5>
                         </div>
                       </div>
 
-                      <div class="col-md-3">
-                        <div class="card card4">
-                          <div class="media">
-                            <img src="icon/icon4.png" class="img-fluid" />
-                            <div class="media-body">
-                              <h4><b>No. 176 </b> Waiting for <br/><span>Approval</span></h4>
-                            </div>
-                            </div>
-                            <h5><a href="#">View more <i class="fa fa-arrow-right" aria-hidden="true"></i></a></h5>
-                        </div>
-                      </div>
-                      <div class="col-md-3">
+
+                      <!-- <div class="col-md-3">
                         <div class="card card5">
                           <div class="media">
                             <img src="icon/icon1.png" class="img-fluid" />
@@ -384,8 +410,7 @@ h3.panel-title {
                             </div>
                             <h5><a href="#">View more <i class="fa fa-arrow-right" aria-hidden="true"></i></a></h5>
                         </div>
-                      </div>
-
+                      </div>-->
                       
                     </div>
                </br>

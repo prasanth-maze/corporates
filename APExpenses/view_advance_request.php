@@ -421,7 +421,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                       <th>S.No.</th>
                       <th>Req. Id</th>
                       <th>Region</th>
-                      <th>Teritory</th>
+                      <th>Territory</th>
                       <th>Crop</th>
                       <th>Sub Activity</th>
                       <th>Req. Date </th>
@@ -511,13 +511,16 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                 LEFT JOIN RASI_POHQTABLE ON ANP_Advance.AdvanceTo=RASI_POHQTABLE.POHQCODE
                 LEFT JOIN APSUBACTIVITYMASTER ON ANP_Advance_Amount.SubActivityId=APSUBACTIVITYMASTER.ID
                 LEFT JOIN ANP_Advance_Payment on ANP_Advance_Amount.Id=ANP_Advance_Payment.AdvAmtId
-                WHERE ANP_Advance.CurrentStatus='1' AND ANP_Advance_Amount.CurrentStatus='1' AND ANP_Advance.AdvanceTo='$emp_id'";
+                WHERE ANP_Advance.CurrentStatus='1' AND ANP_Advance_Amount.CurrentStatus='1'";
                 if($_SESSION['Dcode'] == 'ZM'){
                   $adv_det.=" AND ANP_Advance.ReqDivisionId IN ($dmall)";
                 }elseif($_SESSION['Dcode'] == 'DBM'){
                   $adv_det.=" AND ANP_Advance.ReqRegionId IN ($rgall)";
                 }elseif($_SESSION['Dcode'] == 'TM'){
                   $adv_det.=" AND ANP_Advance.ReqTeritoryId IN ($tmall)";
+                }
+                if($_SESSION['Dcode'] == 'ZM' || $_SESSION['Dcode'] == 'RBM' || $_SESSION['Dcode'] == 'TM'){
+                  $adv_det.=" AND ANP_Advance.AdvanceTo='$emp_id'";
                 }
                 $adv_det.=" GROUP BY 
                 ANP_Advance.AdvId,
@@ -549,7 +552,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                   <td align="right"><?php echo $rows['AdvPaidAmount']; ?></td>
                   <td> 
                   <?php if($rows['ApprovedAmount'] == '') {?>
-                    <button type="button" onclick="window.location.href='remark_advance.php?Advid=<?php echo $rows['AdvId']; ?>&&AdvAmtid=<?php echo $rows['AdvAmtId']; ?>'" class="btn btn-sm btn-danger">Delete&nbsp;</button>
+                    <button type="button" attributeid="<?php echo $rows['AdvAmtId']; ?>"  class="btn btn-sm btn-danger delete">Delete&nbsp;</button>
                   <?php } ?>
                   </td>
                 </tr>
@@ -567,6 +570,28 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
   <!-- End Modal -->
 <?php include 'user_filter_access_script.php'; ?>
 <script>
+$(document).on('click','.delete',function(){
+        var AdvAmtid = $(this).attr("attributeid");
+        var action_type = 'DELETE_ADV_REQ_EACH';
+        var confirm_msg = confirm("Are You Sure ?");
+        if(confirm_msg){
+            $.ajax({
+                type:"POST",
+                url:"ajax_delete.php",
+                data:'action_type='+action_type+'&&AdvAmtid='+AdvAmtid, 
+                success:function(res){
+                    if(res == 1){
+                        window.location.reload();
+                    }else{
+                        alert("Please Check the Details ?");
+                    }
+                }
+            });
+        }else{
+
+        }
+    });
+
 $(document).ready(function() {
     $('.js-example-basic-single').select2();
 });

@@ -44,178 +44,12 @@ if($_SESSION['Dcode'] == 'ZM'){
     $zoneqer = sqlsrv_query($conn,$zone_det);
     $zone_counts = sqlsrv_fetch_array($zoneqer);
     $zone_name = $zone_counts['ZONENAME'];
-}
+  }
   
-  include("phpmailer/class.phpmailer.php");
   $max_is =sqlsrv_query($conn,"SELECT COALESCE(MAX(AdvId),0)+1 As res_id FROM $advreques");  
   $req_det = sqlsrv_fetch_array($max_is);
-  $req_id = $req_det['res_id'];
-  $url = 'http://' . $_SERVER['HTTP_HOST'];             // Get the server
-  $url .= rtrim(dirname($_SERVER['PHP_SELF']), '/\\'); // Get the current directory
-             
-  if(isset($_REQUEST['submit'])){
-    $created_by      = $_SESSION['EmpID'];
-    $created_name    = $_SESSION['Name'];
-    $created_at      = date('Y-m-d H:i:s');
-    $request_id      = $_REQUEST['request_id'];
-    $request_date    = date("Y-m-d", strtotime($_REQUEST['request_date']));
-    $division_id     = $_REQUEST['division_id'];
-    $region_id       = $_REQUEST['region_id'];
-    $teritory_id     = $_REQUEST['teritory_id'];
-    $emp_id          = $_REQUEST['emp_id']; 
-    $division_name   = $_REQUEST['div_name'];
-    $region_name     = $_REQUEST['reg_name'];
-    $teritory_name   = $_REQUEST['teri_name'];
-    $common_remark   = $_REQUEST['common_remark'];
-    $tot_amt         = 0;
-    $crop_id         = array();
-    $activity_id      = array();
-    $sub_activity_id  = array();
-    $avt_amt          = array();
-  
-    $crop_id         = $_REQUEST['crop_id']; 
-    $activity_id     = $_REQUEST['activity_id']; 
-    $sub_activity_id = $_REQUEST['sub_activity_id']; 
-    $avt_amt         = $_REQUEST['avt_amt']; 
-    $max_isd    = sqlsrv_query($conn,"SELECT COALESCE(MAX(AdvId),0)+1 As res_id FROM $advreques");  
-    $req_detd   = sqlsrv_fetch_array($max_isd);
-    $req_idd    = $req_detd['res_id'];
-    $request_id = "ANP/ADV/2019-2020/".''.$req_idd;
-    $insert = sqlsrv_query($conn,"INSERT INTO ANP_Advance(ReqIdPre,ReqId,ReqDate,ReqDivisionId,ReqDivisionName,ReqRegionId,ReqRegionName,ReqTeritoryId,ReqTeritoryName,AdvanceTo,AdvRequestCommonRemark,CreatedBy,CreatedAt ) VALUES ('$request_id','$request_id','$request_date','$division_id','$division_name','$region_id','$region_name','$teritory_id','$teritory_name','$emp_id','$common_remark','$created_by','$created_at')");
-    if($insert){
-      $max_ids  = sqlsrv_query($conn,"SELECT AdvId As max_id FROM ANP_Advance WHERE ReqId = '$request_id'");  
-      $req_dets = sqlsrv_fetch_array($max_ids);
-      $adv_ids  = $req_dets['max_id'];
-    
-      for($i=0,$j=0;$i<sizeof($crop_id);$i++,$j++){
-           $inserta = sqlsrv_query($conn,"INSERT INTO ANP_Advance_Amount(AdvId,CropId,ActivityId,SubActivityId,AdvAmount,CreatedBy,CreatedAt) VALUES ('$adv_ids','$crop_id[$i]','$activity_id[$i]','$sub_activity_id[$i]','$avt_amt[$i]','$created_by','$created_at')"); 
-        $tot_amt = $tot_amt + $avt_amt[$i];
-        }
-      if(sizeof($crop_id) == $j){
-        $Emp_det =sqlsrv_query($conn,"SELECT APDESIGN FROM  EMPLTABLE WHERE EMPLID='".$emp_id."'");
-        $emp_fetch = sqlsrv_fetch_array($Emp_det);
-        $emp_designation = $emp_fetch['APDESIGN'];
-        if($emp_designation == 'DBM'){      
-          $etztable  = sqlsrv_query($conn,"SELECT TOP 1 ZONEID,EMAIL FROM RASI_ZONETABLE WHERE DBMID='".$emp_id."'");
-          $erow_tm   = sqlsrv_fetch_array($etztable);
-          $eTMID_id  = $erow_tm['ZONEID'];
-          $cc_mail   = $erow_tm['EMAIL'];
-          
-          $zone =sqlsrv_query($conn,"SELECT EMAIL FROM RASI_ZONETABLE WHERE ZONEID='".$eTMID_id."' AND EMAIL != ''");
-          While($row_zone = sqlsrv_fetch_array($zone)){
-            $to_mail[] = $row_zone['EMAIL']; 
-          }
-
-        }elseif($emp_designation == 'RBM'){
-          $etztable  = sqlsrv_query($conn,"SELECT REGIONID,EMAIL FROM RASI_REGIONTABLE WHERE RBMID='".$emp_id."'");
-          $erow_tm   = sqlsrv_fetch_array($etztable);
-          $eRGID_id  = $erow_tm['REGIONID'];
-          $cc_mail   = $erow_tm['EMAIL'];
-
-          $eress=sqlsrv_query($conn,"SELECT TOP 1 ZONEID FROM RASI_TRZMAPPINGTABLE WHERE REGIONID='".$eRGID_id."'");
-          $erow_counts = sqlsrv_fetch_array($eress);
-          $ezone_ids = $erow_counts['ZONEID'];
-          
-          $zone =sqlsrv_query($conn,"SELECT EMAIL FROM RASI_ZONETABLE WHERE ZONEID='".$ezone_ids."' AND EMAIL != ''");
-          While($row_zone = sqlsrv_fetch_array($zone)){
-            $to_mail[] = $row_zone['EMAIL']; 
-          }
-        }elseif($emp_designation == 'TM'){
-          $etztable  = sqlsrv_query($conn,"SELECT TMID,EMAIL FROM RASI_TMTABLE WHERE EMPLID='".$emp_id."'");
-          $erow_tm   = sqlsrv_fetch_array($etztable);
-          $eTMID_id  = $erow_tm['TMID'];
-          $cc_mail   = $erow_tm['EMAIL'];
-
-          $eress=sqlsrv_query($conn,"SELECT TOP 1 REGIONID FROM RASI_TRZMAPPINGTABLE WHERE TMID='".$eTMID_id."'");
-          $erow_counts = sqlsrv_fetch_array($eress);
-          $eregion_ids = $erow_counts['REGIONID'];
-          
-          $regon =sqlsrv_query($conn,"SELECT EMAIL FROM RASI_REGIONTABLE WHERE REGIONID='".$eregion_ids."' AND EMAIL != ''");
-          While($row_regon = sqlsrv_fetch_array($regon)){
-            $to_mail[] = $row_regon['EMAIL']; 
-          }
-        }
-        /*  */
-        $subject  ="INR ".$tot_amt." Advance Request From $created_name";
-        $message 	="<div>
-              <table border='0'>
-                  <tr><td>Requested By  </td><td> : </td><td> $created_name</td></tr>
-                  <tr><td>Requested For </td><td> : </td><td> $emp_id</td></tr>
-                  <tr><td>Division      </td><td> : </td><td> $division_name</td></tr>
-                  <tr><td>Region        </td><td> : </td><td> $region_name</td></tr>
-                  <tr> <td>Territory    </td><td> : </td><td> $teritory_name</td></tr>
-              </table>
-            </div></br>
-            <table border='1' >
-            <tr>
-              <th style='padding:5px;'>S.No.</th>
-              <th style='padding:5px;'>Crop</th>
-              <th style='padding:5px;'>Activity</th>
-              <th style='padding:5px;'>Sub Activity</th>
-              <th align='right' style='padding:5px;'>Req. Amt.</th>
-            </tr>";
-          for($i=0,$j=1;$i<sizeof($crop_id);$i++,$j++){
-              $viw_adv =sqlsrv_query($conn,"SELECT DISTINCT ACTIVITYTYPE,SUBACTIVITY FROM APSUBACTIVITYMASTER WHERE APSUBACTIVITYMASTER.ID='$sub_activity_id[$i]'");  
-              $rows             = sqlsrv_fetch_array($viw_adv);
-              $activity_ids     = $rows['ACTIVITYTYPE'];
-              $subactivity_ids  = $rows['SUBACTIVITY'];
-        $message.= " <tr>
-                        <td style='padding:5px;'>$j</td>
-                        <td style='padding:5px;'>$crop_id[$i]</td>
-                        <td style='padding:5px;'>$activity_ids</td>
-                        <td style='padding:5px;'>$subactivity_ids</td>
-                        <td align='right' style='padding:5px;'>$avt_amt[$i]</td>
-                      </tr>";
-          }
-          $message.= "<tr>
-                          <td colspan='4' style='padding:5px;'> <b>Total </b></td>
-                          <td align='right' style='padding:5px;'><b>$tot_amt </b></td>
-                        </tr></table>";
-              
-            $message.= "</br><a href='$url/request_adv_approval.php?Advid=$adv_ids'> Click Here To Approve </a>";          
-            $name 	= "prasanth.p@mazenetsolution.com";
-            $pass		=	"prasanth@12";
-            // $to		  =	"prasanth.p@mazenetsolution.com";
-                              
-            $mail = new PHPMailer();
-            $mail->CharSet =  "utf-8";
-            $mail->IsSMTP();
-            $mail->SMTPAuth = true;
-            $mail->Username = $name;
-            $mail->Password = $pass;
-            $mail->SMTPSecure = "ssl"; // SSL FROM DATABASE
-            $mail->Host = 	    "smtp.gmail.com";// Host FROM DATABASE
-            $mail->Port = 		"465";// Port FROM DATABASE
-            $mail->setFrom($name);
-            foreach($to_mail as $key => $val){   // To Mail ids
-              $mail->AddAddress($val); 
-            }
-            // $mail->AddAddress($to);
-            $mail->addCC($cc_mail);
-            $mail->Subject  = $subject;
-            $mail->IsHTML(true);
-            $mail->Body    = $message;
-            
-            // if($mail->Send())
-            // {
-              echo "<script>window.location='advance_request.php?request_id=".$request_id."'</script>";
-            /* }else {      
-              echo '<script type="text/javascript">
-                window.location.replace("view_advance_request.php?sts=fail");
-                </script>';
-            } */
-      }else{
-          echo '<script type="text/javascript">
-              window.location.replace("view_advance_request.php?sts=fail");
-          </script>';
-      }
-    }else{
-      echo '<script type="text/javascript">
-          window.location.replace("view_advance_request.php?sts=fail");
-      </script>';
-    }
-  }
-  ?>
+  $req_id = $req_det['res_id'];           
+?>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <!-- select 2 -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.0.12/dist/css/select2.min.css" rel="stylesheet" />
@@ -225,7 +59,7 @@ if($_SESSION['Dcode'] == 'ZM'){
 <link rel="stylesheet" href="../assets/css/font-awesome.min.css">
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="css/popup.css">
-
+<script src="https://code.jquery.com/jquery-3.4.1.js"></script>
 <style type="text/css">  
 .card-block1{ 
     position: relative;
@@ -507,7 +341,7 @@ h3.panel-title {
     <div class="page-content container-fluid ">
       <div class="panel panel-bordered">
         <div class="panel-body ReportTablediv expensesDiv" id="ReportTablediv">
-        <form class="form-horizontal form-label-left adv_submit" name="form_name"  role="form" method="POST" enctype="multipart/form-data" >
+        <form id="target" class="form-horizontal form-label-left adv_submit" name="form_name" action="advance_request_save.php" method="POST" enctype="multipart/form-data" >
         <input type="hidden" class="login_type" value="<?php echo $_SESSION['Dcode']?>" readonly>
         <div class="form-group row">
           <div class="col-md-4 col-sm-12 col-xs-12">
@@ -652,6 +486,7 @@ h3.panel-title {
               <div class="col-md-2" style=" margin: auto;">
                   <a href="view_advance_request.php" class="btn btn-danger">Cancel</a>
                   <button type="submit" name="submit" class="btn btn-primary">Submit</button>
+                  <button type="button" name="submit" class="btn btn-primary" onclick="myfunc()">Submit B</button>
               </div>
           </div>
         </form>
@@ -694,14 +529,36 @@ h3.panel-title {
       }else if(login_type =='ZM'){
       }
 });
-  $(document).on('submit','.adv_submit',function(){
+  /* function myfunc(){
+    var error_count=validation();
+    if(error_count == 0){
+      alert();
+      // return true;
+      // $(".adv_submit").submit();
+      // $("#myForm").submit();
+      // document.getElementById("myForm").submit();
+      document.myform.submit();
+
+    }else{
+      return false;
+    }
+  }
+ */
+$( "form" ).submit(function( event ) {
+    var error_count=validation();
+    if(error_count == 0){
+      return;
+    }
+   event.preventDefault();
+});
+  /* $(document).on('submit','.adv_submit',function(){
     var error_count=validation();
     if(error_count == 0){
       return true;
     }else{
       return false;
     } 
-  });
+  }); */
   function s_no(){
     $(".srn_no").each(function(key,index){
       $(this).html((key+1));
@@ -780,7 +637,6 @@ function get_region(val) {
           $('.cls_adv_to').html("<option value=''>Select </option>");
           $('.cls_teritory').html("<option value=''>Select </option>");
            get_employee(action_type,val);
-           remove_option();
         }
     });
 	}
@@ -795,7 +651,6 @@ function get_region(val) {
         success: function(data){
            $('.cls_teritory').html(data);
            get_employee(action_type,val);
-           remove_option();
           }
       });
 	}
@@ -808,7 +663,6 @@ function get_employee(action_type,val) {
         data:'teritory_id='+val+'&&action_type='+action_type+'&&action_emp=GET_EMP_DETAILS',			 
         success: function(data){
            $('.cls_adv_to').append(data);
-           remove_option();
           }
       });
 	}
@@ -841,27 +695,16 @@ function get_subactivity(val) {
   });
     
   function add_row(){
-      var markup = "<tr><td class='srn_no'></td><td><div> <select class='js-example-basic-singles required_for_valid cls_crop' name='crop_id[]'><option value=''>Select Crop</option>"+ $('.crop_div').html() +"</select></div></td><td><div> <select class='js-example-basic-singles  required_for_valid cls_activity' name='activity_id[]'><option value=''>Select Activity</option>"+ $('.Activity_div').html() +"</select></div></td><td><div> <select class='js-example-basic-singles required_for_valid cls_sub_activity' name='sub_activity_id[]'><option value=''>Select Sub Activity</option></select></div></td><td><div><input type='text' class='form-control right max_charater required_for_valid only_numbers' name='avt_amt[]'/></div></td><td><button type='button' onclick ='add_row()' class='btn btn-success'>+</button> <button class='delete btn btn-danger' onclick ='delete_user($(this))'>X</button></tr>";
+      var markup = "<tr><td class='srn_no'></td><td><div> <select class='js-example-basic-single required_for_valid cls_crop' name='crop_id[]'><option value=''>Select Crop</option>"+ $('.crop_div').html() +"</select></div></td><td><div> <select class='js-example-basic-single  required_for_valid cls_activity' name='activity_id[]'><option value=''>Select Activity</option>"+ $('.Activity_div').html() +"</select></div></td><td><div> <select class='js-example-basic-single required_for_valid cls_sub_activity' name='sub_activity_id[]'><option value=''>Select Sub Activity</option></select></div></td><td><div><input type='text' class='form-control right max_charater required_for_valid only_numbers' name='avt_amt[]'/></div></td><td><button type='button' onclick ='add_row()' class='btn btn-success'>+</button> <button class='delete btn btn-danger' onclick ='delete_user($(this))'>X</button></tr>";
       $("table tbody").append(markup);
       s_no();
-      $('.js-example-basic-singles').select2();
+      $('.js-example-basic-single').select2();
     }
 
   function delete_user(row)
   {
     row.closest('tr').remove();
     s_no();
-  }
-
-  function remove_option(){
-      var optionValues = [];
-      $('.cls_adv_to option').each(function(){
-        if($.inArray(this.value, optionValues) >-1){
-          $(this).remove();
-        }else{
-          optionValues.push(this.value);
-        }
-    });
   }
 </script>
 <!-- select 2 -->

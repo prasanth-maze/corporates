@@ -365,7 +365,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
               <div class="row">
                 <label class="col-md-3">Region</label>
                 <div class="col-md-9">
-                <select class="js-example-basic-single col-xs-12 required_for_valid cls_region reg_select" name="region_id" onchange="get_teritory(this.value);document.getElementById('reg_name').value=this.options[this.selectedIndex].text" >
+                <select class="js-example-basic-single col-xs-12 required_for_valid cls_region reg_select" name="region_id" onchange="get_teritory(this.value);" >
                 <option value="">Select </option>
                 </select>
                 <input type="hidden" name="region_id" class="reg_text" value="<?php echo isset($region_ids) ? $region_ids : ""; ?>" disabled/>
@@ -377,8 +377,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
               <div class="row">
                 <label class="col-md-3">Territory</label>
                 <div class="col-md-9">
-                <select class="js-example-basic-single col-xs-12 required_for_valid cls_teritory" name="teritory_id" 
-                onchange="get_employee('GET_EMP_DETAILS',this.value);document.getElementById('teri_name').value=this.options[this.selectedIndex].text">
+                <select class="js-example-basic-single col-xs-12 required_for_valid cls_teritory" name="teritory_id" onchange="get_employee('GET_EMP_DETAILS',this.value);">
                 <option value="">Select </option>
                 </select>
                 </div>
@@ -399,10 +398,9 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                 </div>
               </div>
             </div>
-
-      <div class="col-md-11 ">
-        <input type="submit" class="form-control" name="filter" value="Submit">
-      </div>
+            <div class="col-md-11 ">
+              <input type="submit" class="form-control" name="filter" value="Submit">
+            </div>
           </div>
         </form> 
       </div>
@@ -420,7 +418,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                            <th>Req. Date </th>
                            <th>Division</th>
                            <th>Region</th>
-                           <th>Teritory</th>
+                           <th>Territory</th>
                            <th>Req. Amt.</th>
                            <th>Approved Amt.</th>
                            <th>Paid Amt.</th>
@@ -435,7 +433,7 @@ div.dt-buttons a, div.dt-button-collection a.dt-button{
                 $i =0;
                 if(isset($_REQUEST['filter']))  {
 
-                  $from_date = $to_date = $division_id = $region_id = $teritory_id = $status = '';
+                  $from_date    = $to_date = $division_id = $region_id = $teritory_id = $status = '';
                   $from_date    = date("Y-m-d", strtotime($_REQUEST['fromdate'])); 
                   $to_date      = date("Y-m-d", strtotime($_REQUEST['todate'])); 
                   $division_id  = $_REQUEST['division_id'];

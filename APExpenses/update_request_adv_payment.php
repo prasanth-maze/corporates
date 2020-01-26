@@ -434,7 +434,7 @@ h3.panel-title {
               $view_activity = sqlsrv_query($conn,"  SELECT ANP_Advance_Payment.Id As AdvPayId,ANP_Advance_Amount.Id As adv_amt_id,
               ANP_Advance_Amount.CropId,  ANP_Advance_Amount.ActivityId,APACTIVITYTYPEMASTER.ACTIVITYTYPE,
               ANP_Advance_Amount.SubActivityId, APSUBACTIVITYMASTER.SUBACTIVITY, ANP_Advance_Amount.AdvAmount, ANP_Advance_Amount.ApprovedAmount,ANP_Advance_Amount.ApprovedRemark,ISNULL(ANP_Advance_Payment.AdvPaidAmount,0) As AdvPaidAmount,
-              (ANP_Advance_Amount.ApprovedAmount - ISNULL(ANP_Advance_Payment.AdvPaidAmount,0)) As Balance_Amt  
+              (ANP_Advance_Amount.ApprovedAmount - ISNULL(ANP_Advance_Payment.AdvPaidAmount,0)) As Balance_Amt , ANP_Advance_Payment.DocNo, CONVERT (NVARCHAR(50),ANP_Advance_Payment.DocDate,105) as DocDate
               FROM ANP_Advance_Amount LEFT JOIN APACTIVITYTYPEMASTER ON ANP_Advance_Amount.ActivityId=APACTIVITYTYPEMASTER.ID
               LEFT JOIN APSUBACTIVITYMASTER ON ANP_Advance_Amount.SubActivityId=APSUBACTIVITYMASTER.ID
               LEFT JOIN ANP_Advance_Payment on ANP_Advance_Amount.Id=ANP_Advance_Payment.AdvAmtId
@@ -455,11 +455,11 @@ h3.panel-title {
                     <!-- <td class ="max_amount" align="right"><?php $tot_bal_amt =  $tot_bal_amt + $fetch_activity_det['Balance_Amt']; echo $fetch_activity_det['Balance_Amt'] ;?></td> -->
                     
                     <td>
-                      <div><input type="text" class="form-control"  name="doc_no[]" value=""></div>
+                      <div><input type="text" class="form-control"  name="doc_no[]" value="<?php echo $fetch_activity_det['DocNo']; ?>"></div>
                     </td>
                     <td>
                         <div class="input-daterange input-group" data-plugin="datepicker" data-date-format="dd-mm-yyyy">
-                            <input type="text" class="form-control"  name="doc_date[]" value="<?php echo date('d-m-Y'); ?>">
+                            <input type="text" class="form-control"  name="doc_date[]" value="<?php echo $fetch_activity_det['DocDate']; ?>">
                         </div>
                     </td>
                    <!--  <td><div><input type="text" class="form-control right required_for_valid entering_amt" value="<?php echo $fetch_activity_det['Balance_Amt'] ;?>"></div></td> -->
@@ -481,7 +481,6 @@ h3.panel-title {
               
               <td></td>
               <td></td>
-x -->
           </tr>
     </tbody>
   </table>
